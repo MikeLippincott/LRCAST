@@ -47,6 +47,7 @@ def multi_phase_translate(nt):
 # export function peptide sequence to fasta
 def prot_to_fasta(seqrecord,
                   output,
+                  prefix,
                   suffix):
     """
     :param seqrecord: BioSeq seqrecord record object
@@ -54,7 +55,7 @@ def prot_to_fasta(seqrecord,
     :param suffix: string to be added to filename before extension
     :return: fasta file
     """
-    outfile = os.path.join(output, 'JCASTLR' + suffix + '.fasta')
+    outfile = os.path.join(output, prefix + 'JCASTLR' + suffix + '.fasta')
     # if the file already exists, open it and amend that record.
     existing_records = []
     if os.path.exists(outfile):

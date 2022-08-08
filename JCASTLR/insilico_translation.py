@@ -79,7 +79,7 @@ class Sequences(object):
                                              'uniprot_gn_id',
                                              'entrezgene_description'],
                                  filters={'link_ensembl_transcript_stable_id': self.transcript})
-            self.level = 'Canonnical'
+            self.level = 'canonical'
             self.gene_name = str(np.unique(enst['NCBI gene (formerly Entrezgene) description'])).strip("[']")
             self.gene_symbol = str(np.unique(enst['HGNC symbol'])).strip("[']")
             self.chromosome = str(np.unique(enst['Chromosome/scaffold name'])).strip("[']")
@@ -205,7 +205,7 @@ def main(gtf, bed, fasta, out_location):
             a.subset_gtf()
             a.get_meta()
             a.make_header()
-            if a.level == "Canonnical":
+            if a.level == "canonical":
                 p = Peptide(a)
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()

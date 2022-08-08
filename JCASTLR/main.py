@@ -11,6 +11,7 @@ from Bio.SeqRecord import SeqRecord
 from pybiomart import Server # for retrieval of Uniprot IDs
 import constants
 import os
+from time import sleep
 
 # Main function
 def main():
@@ -19,12 +20,14 @@ def main():
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
     parser.add_argument('-b', '--bed', help='path to bed file', required=True)
     parser.add_argument('-f', '--fasta', help='path to fasta file', required=True)
+    parser.add_argument('-p', '--file_prefix', help='filename prefix (not path)', required=True)
     parser.add_argument('-o', '--outpath', help='Output path. Note JCASTLR autonames files', required=True)
     args = parser.parse_args()
     # set constants
     gtf =  args.gtf
     bed = args.bed
     fasta = args.fasta
+    prefix = args.file_prefix
     out_location = args.outpath
     g = ist.Gtf(gtf)
     b = ist.Bed(bed)
@@ -38,6 +41,7 @@ def main():
         for line in f:
             if line.startswith(">"):
                 n += 1
+    print(fasta)
     with open(fasta) as f:
         for record in SeqIO.parse(f, 'fasta'):
             n1 += 1
@@ -47,7 +51,7 @@ def main():
             a.subset_gtf()
             a.get_meta()
             a.make_header()
-            if a.level == "Canonnical":
+            if a.level == "canonical":
                 p = ist.Peptide(a)
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
@@ -64,12 +68,14 @@ def main():
                 level2.append(seq)
             else:
                 print("a.id")
-
-        lrf.prot_to_fasta(canon, out_location, "canonnical")
-        print(f'{len(canon)} Canonnical Isoforms')
-        lrf.prot_to_fasta(level1, out_location, "level1")
+        for i in canon:
+            lrf.prot_to_fasta(i, out_location, prefix,"canonical")
+        print(f'{len(canon)} canonical Isoforms')
+        for i in level1:
+            lrf.prot_to_fasta(i, out_location,prefix, "level1")
         print(f'{len(level1)} Level 1 Isoforms')
-        lrf.prot_to_fasta(level2, out_location, "level2")
+        for i in level2:
+            lrf.prot_to_fasta(i, out_location, prefix,"level2")
         print(f'{len(level2)} Level 2 Isoforms')
 
 
