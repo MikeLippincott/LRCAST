@@ -7,11 +7,15 @@ samples:
     - 'test2_long'
     - 'test3_long'
     - 'test4_long'
+    - 'test5_long'
+    - 'test6_long'
   short:
     - 'test1_short'
     - 'test2_short'
     - 'test3_short'
     - 'test4_short'
+    - 'test5_short'
+    - 'test6_short'
   exp:
     'experiment_info'
 
@@ -32,6 +36,12 @@ qc_list:
   - 'test2_short_2'
   - 'test3_short_1'
   - 'test3_short_2'
+  - 'test4_short_1'
+  - 'test4_short_2'
+  - 'test5_short_1'
+  - 'test5_short_2'
+  - 'test6_short_1'
+  - 'test6_short_2'
 
 STAR_index:
   "results/aligned/STAR_index"

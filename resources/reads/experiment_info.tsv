@@ -1,4 +1,6 @@
 sample1	conditionA	batch1	resources/reads/test1_long.fastq
 sample2	conditionA	batch1	resources/reads/test2_long.fastq
-sample3	conditionB	batch1	resources/reads/test3_long.fastq
+sample3	conditionA	batch1	resources/reads/test3_long.fastq
 sample4	conditionB	batch1	resources/reads/test4_long.fastq
+sample5	conditionB	batch1	resources/reads/test5_long.fastq
+sample6	conditionB	batch1	resources/reads/test6_long.fastq
