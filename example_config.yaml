@@ -47,12 +47,4 @@ STAR_index:
   "results/aligned/STAR_index"
 
 
-#comet:
-#  comet_loc:
-#  ../comet.macos.exe
-#  param_loc:
-#  ../Comet2020_Hs_Sp_TMT_Trypsin.params
-#
-#percolator_loc:
-#  ../../packages/crux-4.1.Darwin.x86_64/bin/crux percolator
 
