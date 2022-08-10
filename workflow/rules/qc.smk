@@ -1,5 +1,3 @@
-configfile: "resources/config.yaml"
-
 rule fastqc:
     input:
         "resources/reads/{qc_sample}.fastq"
