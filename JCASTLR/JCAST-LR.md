@@ -10,17 +10,24 @@ python JCASTLR path/to/gtf/file.gtf -b path/to/bed/file.bed -f path/to/fasta/fil
 >Canonnical|ENSG00000169972|ENST00000379031|J3KTG4 Q8N0Z8 |PUSL1|+|Chromosome 1 |  pseudouridine synthase like 1
 ```
 
-1. Level
-   1. Canonnical peptide isoform
-   2. Level 1
-      1. Non-cononical peptide isoform from canonnical gene
-   3. Level 2
-      1. Non-cononnical peptide isoform from non-cononnical gene
-2. Ensembl Gene id
-3. Ensembl transcript id
-4. Uniprot ids
-5. Gene Symbol
-6. Isoform strand
-7. Chromosome
+
+JCAST-LR FASTA Custom Header Format 
+
+1. Knowledgebase name, from canonical SwissProt protein entry (sp)
+2. UniProt accession, from canonical SwissProt protein entry (Q91VW5)
+3. UniProt name, from canonical SwissProt protein entry (GOGA4_MOUSE)
+4. Annotated gene name (ENSMUSG00000038708)
+5. Ensembl transcript id
+6. Gene Symbol
+7. Chromosome (chr9)
+8. Isoform strand
+9. Level (L1)
 
 
+### JCAST-LR Levels:
+### Level 1:
+   Identified Gene ID and Transcript ID
+### Level 2:
+   Identified Gene ID Only
+### Level 3:
+   Orphaned Read

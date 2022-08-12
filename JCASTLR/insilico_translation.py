@@ -23,10 +23,10 @@ class Bed:
         header = ['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'itemRgb',
                   'blockCount', 'blockSizes', 'blockStarts']
         self.bed.columns = header[:len(self.bed.columns)]
-        self.name = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['name'].tolist()
-        self.score = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['score'].tolist()
-        self.start = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromStart'].tolist()
-        self.end = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromEnd'].tolist()
+        # self.name = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['name'].tolist()
+        # self.score = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['score'].tolist()
+        # self.start = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromStart'].tolist()
+        # self.end = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromEnd'].tolist()
 
 # Imports GTF file as object
 class Gtf:
@@ -79,7 +79,7 @@ class Sequences(object):
                                              'uniprot_gn_id',
                                              'entrezgene_description'],
                                  filters={'link_ensembl_transcript_stable_id': self.transcript})
-            self.level = 'canonical'
+            self.level = 'L1'
             self.gene_name = str(np.unique(enst['NCBI gene (formerly Entrezgene) description'])).strip("[']")
             self.gene_symbol = str(np.unique(enst['HGNC symbol'])).strip("[']")
             self.chromosome = str(np.unique(enst['Chromosome/scaffold name'])).strip("[']")
@@ -109,7 +109,7 @@ class Sequences(object):
                                              'chromosome_name',
                                              'uniprot_gn_id',
                                              'entrezgene_description'], filters={'link_ensembl_gene_id': self.id})
-            self.level = 'Level 1'
+            self.level = 'L2'
             self.gene_name = str(np.unique(ensg['NCBI gene (formerly Entrezgene) description'])).strip("[']")
             self.gene_symbol = str(np.unique(ensg['HGNC symbol'])).strip("[']")
             self.chromosome = str(np.unique(ensg['Chromosome/scaffold name'])).strip("[']")
@@ -133,22 +133,32 @@ class Sequences(object):
 
         else:
             # print('Level 2', self.transcript,self.id)
-            self.level = 'Level 2'
+            self.level = 'L3'
             self.gene_name = '---'
             self.gene_symbol = '---'
             self.uniprot = '---'
             self.chromosome = '---'
             # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
     # make a header for outputed Fasta file in Peptide class
+    # def make_header(self):
+    #     self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6} | ".format(
+    #         self.level,
+    #         self.id,
+    #         self.transcript,
+    #         self.uniprot,
+    #         self.gene_symbol,
+    #         self.strand,
+    #         f'Chromosome {self.chromosome}',)
     def make_header(self):
-        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6} | ".format(
-            self.level,
+        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+            "sp",
+            self.uniprot,
             self.id,
             self.transcript,
-            self.uniprot,
             self.gene_symbol,
             self.strand,
-            f'Chromosome {self.chromosome}',)
+            f'Chromosome {self.chromosome}',
+            self.level,)
         # return self.header
 
 # Peptide Seq object class
@@ -180,92 +190,4 @@ class Peptide(object):
     def str_to_seqrec(self):
         self.rec = SeqRecord(Seq(self.prot),f'{self.header}',description=self.gene_name)
         return self.rec
-
-
-# Main callable function outputs a fasta file of peptide sequence
-def main(gtf, bed, fasta, out_location):
-    g = Gtf(gtf)
-    b = Bed(bed)
-    m = LoadMart()
-    with open(fasta) as f:
-        canon = []
-        level1 = []
-        level2 = []
-        n = 0
-        n1 = 0
-        for line in f:
-            if line.startswith(">"):
-                n += 1
-    with open(fasta) as f:
-        for record in SeqIO.parse(f, 'fasta'):
-            n1 += 1
-            progress_bar(n1, n, 50)
-            r = record
-            a = Sequences(g, m, r)
-            a.subset_gtf()
-            a.get_meta()
-            a.make_header()
-            if a.level == "canonical":
-                p = Peptide(a)
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
-                canon.append(seq)
-            elif a.level == "Level 1":
-                p = Peptide(a)
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
-                level1.append(seq)
-            elif a.level == "Level 2":
-                p = Peptide(a)
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
-                level2.append(seq)
-            else:
-                print("a.id")
-
-        prot_to_fasta(canon, out_location, "canonnical")
-        prot_to_fasta(level1, out_location, "level1")
-        prot_to_fasta(level2, out_location, "level2")
-
-
-"""
-Gene Name
-Transcript Name
-Chromosome (chr9)
-strand
-Level
-    if level == 1
-        UniProt accession, from canonical SwissProt protein entry (Q91VW5)
-        Gene Symbol
-    if level == 2
-        UniProt accession, from canonical SwissProt protein entry (Q91VW5)
-        Gene Symbol
-    if level == 3
-        NA
-        NA
-        NA
-        NA
-
-#ex
-# Canonical
->ENST00000373062_ENSG00000134697
-
-# Tier 1
->ERR2856514.2295577_ENSG00000134697
-
-# Tier 2
->ERR2856514.1061877_1:19000
-"""
-
-
-
-
-
-
-
-
-
-
-
-
 

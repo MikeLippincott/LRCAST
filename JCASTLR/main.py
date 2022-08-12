@@ -33,9 +33,9 @@ def main():
     b = ist.Bed(bed)
     m = ist.LoadMart()
     with open(fasta) as f:
-        canon = []
-        level1 = []
-        level2 = []
+        L1 = []
+        L2 = []
+        L3 = []
         n = 0
         n1 = 0
         for line in f:
@@ -51,32 +51,32 @@ def main():
             a.subset_gtf()
             a.get_meta()
             a.make_header()
-            if a.level == "canonical":
+            if a.level == "L1":
                 p = ist.Peptide(a)
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
-                canon.append(seq)
-            elif a.level == "Level 1":
+                L1.append(seq)
+            elif a.level == "L2":
                 p = ist.Peptide(a)
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
-                level1.append(seq)
-            elif a.level == "Level 2":
+                L2.append(seq)
+            elif a.level == "L3":
                 p = ist.Peptide(a)
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
-                level2.append(seq)
+                L3.append(seq)
             else:
-                print("a.id")
-        for i in canon:
-            lrf.prot_to_fasta(i, out_location, prefix,"canonical")
-        print(f'{len(canon)} canonical Isoforms')
-        for i in level1:
-            lrf.prot_to_fasta(i, out_location,prefix, "level1")
-        print(f'{len(level1)} Level 1 Isoforms')
-        for i in level2:
-            lrf.prot_to_fasta(i, out_location, prefix,"level2")
-        print(f'{len(level2)} Level 2 Isoforms')
+                print(a.id)
+        for i in L1:
+            lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
+        print(f'{len(L1)} Level 1 Isoforms')
+        for i in L2:
+            lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
+        print(f'{len(L2)} Level 2 Isoforms')
+        for i in L3:
+            lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
+        print(f'{len(L3)} Level 3 Isoforms')
 
 
 
