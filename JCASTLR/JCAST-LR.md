@@ -5,7 +5,7 @@
 python JCASTLR path/to/gtf/file.gtf -b path/to/bed/file.bed -f path/to/fasta/file.fa -o output/directory
 ```
 
-### Fasta Header Format
+
 ```
 >Canonnical|ENSG00000169972|ENST00000379031|J3KTG4 Q8N0Z8 |PUSL1|+|Chromosome 1 |  pseudouridine synthase like 1
 ```
