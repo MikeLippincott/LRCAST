@@ -1,4 +1,4 @@
-# JCAST-LR
+# Long Read Centric Alternative Splicing Translator
 
 ## Short
 ```
