@@ -31,11 +31,11 @@ def main():
     out_location = args.outpath
     g = ist.Gtf(gtf)
     b = ist.Bed(bed)
-    m = ist.LoadMart()
     with open(fasta) as f:
         L1 = []
         L2 = []
         L3 = []
+        L4 = []
         n = 0
         n1 = 0
         for line in f:
@@ -47,7 +47,7 @@ def main():
             n1 += 1
             lrf.progress_bar(n1, n, 50)
             r = record
-            a = ist.Sequences(g, m, r)
+            a = ist.Sequences(g, r)
             a.subset_gtf()
             a.get_meta()
             a.make_header()
@@ -66,6 +66,11 @@ def main():
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L3.append(seq)
+            elif a.level == "L4":
+                p = ist.Peptide(a)
+                p.multi_phase_translate()
+                seq = p.str_to_seqrec()
+                L4.append(seq)
             else:
                 print(a.id)
         for i in L1:

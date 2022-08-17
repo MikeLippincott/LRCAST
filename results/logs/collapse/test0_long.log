@@ -1,0 +1,17 @@
+Annotated ends extracted from GTF
+Read data extracted
+Single-exon genes grouped, collapsing
+[M::mm_idx_gen::0.092*1.04] collected minimizers
+[M::mm_idx_gen::0.103*1.34] sorted minimizers
+[M::main::0.105*1.32] loaded/built the index for 2710 target sequence(s)
+[M::mm_mapopt_update::0.112*1.30] mid_occ = 18
+[M::mm_idx_stat] kmer size: 15; skip: 10; is_hpc: 0; #seq: 2710
+[M::mm_idx_stat::0.117*1.29] distinct minimizers: 736820 (93.69% are singletons); average occurrences: 1.089; average spacing: 5.403; total length: 4335769
+[M::worker_pipeline::0.972*3.36] mapped 10000 sequences
+[M::main] Version: 2.24-r1122
+[M::main] CMD: minimap2 -a -t 4 -N 4 results/isoforms/test0_long.firstpass.fa resources/reads/test0_long.fastq
+[M::main] Real time: 0.977 sec; CPU: 3.268 sec; Peak RSS: 0.183 GB
+Writing temporary files to /var/folders/_v/kylbj0cj16v0j5dw8qbkn_sm0000gn/T/tmpwy0sq4d7/	
+Renaming isoforms using gtf
+Aligning reads to first-pass isoform reference
+Filtering isoforms by read coverage

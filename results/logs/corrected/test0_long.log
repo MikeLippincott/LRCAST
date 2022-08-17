@@ -1,0 +1,45 @@
+
+Step 1/5: Splitting junctions from GTF by chromosome:   0%|          | 0/251121 [00:00<?, ?it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  10%|▉         | 24624/251121 [00:00<00:00, 246213.23it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  20%|█▉        | 49976/251121 [00:00<00:00, 250501.09it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  30%|██▉       | 75027/251121 [00:00<00:00, 249417.56it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  40%|████      | 101059/251121 [00:00<00:00, 253704.17it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  51%|█████     | 127919/251121 [00:00<00:00, 259063.69it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  61%|██████▏   | 153828/251121 [00:00<00:00, 249372.03it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  71%|███████▏  | 179467/251121 [00:00<00:00, 251603.69it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  82%|████████▏ | 205318/251121 [00:00<00:00, 253750.58it/s][A
+Step 1/5: Splitting junctions from GTF by chromosome:  92%|█████████▏| 230864/251121 [00:00<00:00, 254274.42it/s][AStep 1/5: Splitting junctions from GTF by chromosome: 100%|██████████| 251121/251121 [00:00<00:00, 253787.02it/s]
+
+Step 3/5: Preparing annotated junctions to use for correction:   0%|          | 0/47 [00:00<?, ?it/s][A
+Step 3/5: Preparing annotated junctions to use for correction:   4%|▍         | 2/47 [00:00<00:02, 17.64it/s][A
+Step 3/5: Preparing annotated junctions to use for correction:  13%|█▎        | 6/47 [00:00<00:01, 26.26it/s][A
+Step 3/5: Preparing annotated junctions to use for correction:  21%|██▏       | 10/47 [00:00<00:01, 31.89it/s][A
+Step 3/5: Preparing annotated junctions to use for correction:  30%|██▉       | 14/47 [00:00<00:00, 33.66it/s][A
+Step 3/5: Preparing annotated junctions to use for correction:  38%|███▊      | 18/47 [00:00<00:00, 34.28it/s][AStep 3/5: Preparing annotated junctions to use for correction: 100%|██████████| 47/47 [00:00<00:00, 72.18it/s]
+
+Step 4/5: Preparing reads for correction: 0it [00:00, ?it/s][AStep 4/5: Preparing reads for correction: 6654it [00:00, 628027.16it/s]
+
+Step 5/5: Correcting Splice Sites:   0%|          | 0/29 [00:00<?, ?it/s][A
+Step 5/5: Correcting Splice Sites:   3%|▎         | 1/29 [00:01<00:53,  1.90s/it][A
+Step 5/5: Correcting Splice Sites:  17%|█▋        | 5/29 [00:03<00:13,  1.80it/s][A
+Step 5/5: Correcting Splice Sites:  21%|██        | 6/29 [00:03<00:11,  2.06it/s][A
+Step 5/5: Correcting Splice Sites:  31%|███       | 9/29 [00:04<00:09,  2.16it/s][A
+Step 5/5: Correcting Splice Sites:  34%|███▍      | 10/29 [00:05<00:08,  2.33it/s][A
+Step 5/5: Correcting Splice Sites:  38%|███▊      | 11/29 [00:05<00:06,  2.75it/s][A
+Step 5/5: Correcting Splice Sites:  45%|████▍     | 13/29 [00:06<00:07,  2.17it/s][A
+Step 5/5: Correcting Splice Sites:  48%|████▊     | 14/29 [00:06<00:06,  2.30it/s][A
+Step 5/5: Correcting Splice Sites:  52%|█████▏    | 15/29 [00:06<00:05,  2.63it/s][A
+Step 5/5: Correcting Splice Sites:  55%|█████▌    | 16/29 [00:07<00:04,  3.16it/s][A
+Step 5/5: Correcting Splice Sites:  59%|█████▊    | 17/29 [00:08<00:06,  1.99it/s][A
+Step 5/5: Correcting Splice Sites:  62%|██████▏   | 18/29 [00:08<00:05,  2.16it/s][A
+Step 5/5: Correcting Splice Sites:  66%|██████▌   | 19/29 [00:08<00:04,  2.42it/s][A
+Step 5/5: Correcting Splice Sites:  72%|███████▏  | 21/29 [00:09<00:03,  2.16it/s][A
+Step 5/5: Correcting Splice Sites:  76%|███████▌  | 22/29 [00:10<00:02,  2.36it/s][A
+Step 5/5: Correcting Splice Sites:  79%|███████▉  | 23/29 [00:10<00:02,  2.63it/s][A
+Step 5/5: Correcting Splice Sites:  83%|████████▎ | 24/29 [00:10<00:01,  3.18it/s][A
+Step 5/5: Correcting Splice Sites:  86%|████████▌ | 25/29 [00:11<00:01,  2.05it/s][A
+Step 5/5: Correcting Splice Sites:  90%|████████▉ | 26/29 [00:11<00:01,  2.33it/s][A
+Step 5/5: Correcting Splice Sites:  93%|█████████▎| 27/29 [00:11<00:00,  2.68it/s][A
+Step 5/5: Correcting Splice Sites: 100%|██████████| 29/29 [00:12<00:00,  2.72it/s][AStep 5/5: Correcting Splice Sites: 100%|██████████| 29/29 [00:12<00:00,  2.29it/s]
+
+
