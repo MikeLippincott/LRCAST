@@ -50,24 +50,30 @@ def main():
             a = ist.Sequences(g, r)
             a.subset_gtf()
             a.get_meta()
+            trimmed = a.annotated_trancript_trim()
             a.make_header()
+            # print(a.level, a.rid, a.biotype)
             if a.level == "L1":
                 p = ist.Peptide(a)
+                p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L1.append(seq)
             elif a.level == "L2":
                 p = ist.Peptide(a)
+                p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L2.append(seq)
             elif a.level == "L3":
                 p = ist.Peptide(a)
+                p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L3.append(seq)
             elif a.level == "L4":
                 p = ist.Peptide(a)
+                p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L4.append(seq)
@@ -82,6 +88,9 @@ def main():
         for i in L3:
             lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
         print(f'{len(L3)} Level 3 Isoforms')
+        for i in L4:
+            lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
+        print(f'{len(L4)} Level 4 Isoforms')
 
 
 

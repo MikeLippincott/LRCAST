@@ -159,12 +159,16 @@ class Sequences(object):
 
             print(self.tid)
             enst = gget.info(self.tid)
-            self.gene_name = enst['protein_names'].to_list()
-            print(self.gene_name)
-            if pd.isnull(self.gene_name) == True:
-                self.gene_name = "-"
-            else:
-                self.gene_name = self.gene_name[0]
+            # self.gene_name = enst['protein_names'].to_list()[0]
+            # print(self.gene_name[0])
+            try:
+                if pd.isnull(enst['protein_names'].to_list()[0]) == True:
+                    self.gene_name = "-"
+                else:
+                    self.gene_name = enst['protein_names'].to_list()[0]
+            except:
+                self.gene_name = enst['protein_names'].to_list()[0][0]
+
             print(self.gene_name)
             self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
@@ -188,12 +192,15 @@ class Sequences(object):
 
             print(self.gid)
             ensg = gget.info(self.gid)
-            self.gene_name = ensg['protein_names'].to_list()
-            print(self.gene_name)
-            if pd.isnull(self.gene_name) == True:
-                self.gene_name = "-"
-            else:
-                self.gene_name = self.gene_name[0]
+            # self.gene_name = ensg['protein_names'].to_list()
+            # print(self.gene_name[0])
+            try:
+                if pd.isnull(ensg['protein_names'].to_list()[0]) == True:
+                    self.gene_name = "-"
+                else:
+                    self.gene_name = ensg['protein_names'].to_list()[0]
+            except:
+                self.gene_name = ensg['protein_names'].to_list()[0][0]
             print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
