@@ -429,7 +429,7 @@ class Cannonical_test:
                 self.s.tsl,
                 self.s.level, )
         else:
-            self.header = self.canonical_aa.id + "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
+            self.header = self.canonical_aa.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
                 self.s.uniprot,
                 self.s.gene_symbol,
                 self.s.gid,
@@ -445,14 +445,15 @@ class Cannonical_test:
 # Peptide Seq object class
 class Peptide(object):
     def __init__(self,
-                 sequence: Sequences):
+                 sequence: Sequences,
+                 canonical: Cannonical_test):
         sequence.subset_gtf()
         sequence.get_meta()
-        sequence.make_header()
+        canonical.make_header()
         self.seq = str(sequence.seq)
         self.strand = sequence.strand
         self.frame = sequence.frame
-        self.header = sequence.header
+        self.header = canonical.header
         self.gene_name = sequence.gene_name
 
     def annotated_translate(self):
