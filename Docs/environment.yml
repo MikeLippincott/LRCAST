@@ -1,0 +1,30 @@
+name: General
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - minimap2
+  - samtools
+  - bedtools
+  - numpy
+  - cython
+  - kerneltree
+  - tqdm
+  - pybedtools
+  - multiprocess
+  - snakemake
+  - multiqc
+  - fastqc
+  - graphviz
+  - pandas
+  - biopython
+  - scikit-learn
+  - gtfparse
+  - star=2.7.9a
+  - suppa
+  - goatools
+  - r-irkernel
+  - pybiomart
+  - fastq-tools
