@@ -1,0 +1,33 @@
+
+# Run mode dictates whether short reads are included in analysis or not.
+# short reads will be used to correct the long reads and identify Junctions
+runmode:
+  "Long"
+
+# Note that samples need to paired positionally to be analyzed correctly
+# ex. test1_long and test1_short belong to the same sample type
+samples:
+  long:
+    - 'test0_long'
+  short:
+    - 'test1_short'
+    - 'test2_short'
+
+  exp:
+    'experiment_info'
+
+genome:
+  gtf:
+    "resources/genome/Homo_sapiens.GRCh38.107.gtf"
+  fa:
+    "resources/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+qc_list:
+  - 'test1_long'
+
+
+
+STAR_index:
+  "results/aligned/STAR_index"
+
+
+
