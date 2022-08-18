@@ -6,8 +6,8 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from pybiomart import Server # for retrieval of Uniprot IDs
-from JCASTLR import constants
-from JCASTLR import longread_functions as lrf
+import constants
+# from JCASTLR import longread_functions as lrf
 import gget
 import sqlite3 as sq
 import re
@@ -157,7 +157,7 @@ class Sequences(object):
             else:
                 print("Check Meta Data method in Sequences Class")
 
-            print(self.tid)
+            # print(self.tid)
             enst = gget.info(self.tid)
             # self.gene_name = enst['protein_names'].to_list()[0]
             # print(self.gene_name[0])
@@ -169,7 +169,7 @@ class Sequences(object):
             except:
                 self.gene_name = enst['protein_names'].to_list()[0][0]
 
-            print(self.gene_name)
+            # print(self.gene_name)
             self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0:
@@ -190,7 +190,7 @@ class Sequences(object):
             else:
                 print("Check Meta Data method in Sequences Class")
 
-            print(self.gid)
+            # print(self.gid)
             ensg = gget.info(self.gid)
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
@@ -201,7 +201,7 @@ class Sequences(object):
                     self.gene_name = ensg['protein_names'].to_list()[0]
             except:
                 self.gene_name = ensg['protein_names'].to_list()[0][0]
-            print(self.gene_name)
+            # print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             self.uniprot = ensg['uniprot_id'].to_list()[0]
@@ -385,69 +385,59 @@ class Peptide(object):
         return self.rec
 
 #
-g = Gtf("results/isoforms/test0_long.isoforms.gtf")
-fasta = "results/isoforms/test0_long.isoforms.fa"
+# g = Gtf("results/isoforms/test0_long.isoforms.gtf")
+# fasta = "results/isoforms/test0_long.isoforms.fa"
 
 
 
-f1 = 0
-f2 = 0
-both = 0
-no_start = 0
-L1 = []
-L2 = []
-L3 = []
-L4 = []
+# f1 = 0
+# f2 = 0
+# both = 0
+# no_start = 0
+# L1 = []
+# L2 = []
+# L3 = []
+# L4 = []
+#
+# with open(fasta) as f:
+#     for record in SeqIO.parse(f, 'fasta'):
+#         # n1 += 1
+#         # lrf.progress_bar(n1, n, 50)
+#         r = record
+#         a = Sequences(g, r)
+#         a.subset_gtf()
+#         a.get_meta()
+#         trimmed = a.annotated_trancript_trim()
+#         a.make_header()
+#         # print(a.level, a.rid, a.biotype)
+#         if a.level == "L1":
+#             p = Peptide(a)
+#             p.annotated_translate()
+#             p.multi_phase_translate()
+#             seq = p.str_to_seqrec()
+#             L1.append(seq)
+#         elif a.level == "L2":
+#             p = Peptide(a)
+#             p.annotated_translate()
+#             p.multi_phase_translate()
+#             seq = p.str_to_seqrec()
+#             L2.append(seq)
+#         elif a.level == "L3":
+#             p = Peptide(a)
+#             p.annotated_translate()
+#             p.multi_phase_translate()
+#             seq = p.str_to_seqrec()
+#             L3.append(seq)
+#         elif a.level == "L4":
+#             p = Peptide(a)
+#             p.annotated_translate()
+#             p.multi_phase_translate()
+#             seq = p.str_to_seqrec()
+#             L4.append(seq)
+#         else:
+#             print("Pleb")
+# print(len(L1),len(L2),len(L3),len(L4))
 
-with open(fasta) as f:
-    for record in SeqIO.parse(f, 'fasta'):
-        # n1 += 1
-        # lrf.progress_bar(n1, n, 50)
-        r = record
-        a = Sequences(g, r)
-        a.subset_gtf()
-        a.get_meta()
-        trimmed = a.annotated_trancript_trim()
-        a.make_header()
-        # print(a.level, a.rid, a.biotype)
-        if a.level == "L1":
-            p = Peptide(a)
-            p.annotated_translate()
-            p.multi_phase_translate()
-            seq = p.str_to_seqrec()
-            L1.append(seq)
-        elif a.level == "L2":
-            p = Peptide(a)
-            p.annotated_translate()
-            p.multi_phase_translate()
-            seq = p.str_to_seqrec()
-            L2.append(seq)
-        elif a.level == "L3":
-            p = Peptide(a)
-            p.annotated_translate()
-            p.multi_phase_translate()
-            seq = p.str_to_seqrec()
-            L3.append(seq)
-        elif a.level == "L4":
-            p = Peptide(a)
-            p.annotated_translate()
-            p.multi_phase_translate()
-            seq = p.str_to_seqrec()
-            L4.append(seq)
-        else:
-            print("Pleb")
-print(len(L1),len(L2),len(L3),len(L4))
-L1
-L2
-L3
-L4
-
-with open(fasta) as f:
-    n =0
-    for line in f:
-        if line.startswith(">"):
-            n += 1
-print(n)
 
 # uniprot_max_retries = 10  # max number of retries if retrieving sequences from Uniprot
 # class Tests:

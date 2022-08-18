@@ -79,18 +79,18 @@ def main():
                 L4.append(seq)
             else:
                 print(a.id)
-        for i in L1:
-            lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
-        print(f'{len(L1)} Level 1 Isoforms')
-        for i in L2:
-            lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
-        print(f'{len(L2)} Level 2 Isoforms')
-        for i in L3:
-            lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
-        print(f'{len(L3)} Level 3 Isoforms')
-        for i in L4:
-            lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
-        print(f'{len(L4)} Level 4 Isoforms')
+    for i in L1:
+        lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
+    print(f'{len(L1)} Level 1 Isoforms')
+    for i in L2:
+        lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
+    print(f'{len(L2)} Level 2 Isoforms')
+    for i in L3:
+        lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
+    print(f'{len(L3)} Level 3 Isoforms')
+    for i in L4:
+        lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
+    print(f'{len(L4)} Level 4 Isoforms')
 
 
 

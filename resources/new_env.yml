@@ -1,0 +1,21 @@
+name: General
+channels:
+  - anaconda
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas
+  - numpy
+  - gtfparse
+  - Bio
+  - gget
+  - os
+  - argparse
+  - time
+  - sqlite3
+  - re
+  - requests
+  - logging
+  - urllib3
+  - io
