@@ -44,41 +44,44 @@ def main():
     print(fasta)
     with open(fasta) as f:
         for record in SeqIO.parse(f, 'fasta'):
-            n1 += 1
-            lrf.progress_bar(n1, n, 50)
+            # n1 += 1
+            # lrf.progress_bar(n1, n, 50)
             r = record
-            a = ist.Sequences(g, r)
-            a.subset_gtf()
-            a.get_meta()
-            trimmed = a.annotated_trancript_trim()
+            s = ist.Sequences(g, r)
+            s.subset_gtf()
+            s.get_meta()
+            trimmed = s.annotated_trancript_trim()
+            a = ist.Cannonical_test(s)
+            a.get_canonical_aa()
             a.make_header()
             # print(a.level, a.rid, a.biotype)
-            if a.level == "L1":
-                p = ist.Peptide(a)
+            if s.level == "L1":
+                p = ist.Peptide(s)
                 p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L1.append(seq)
-            elif a.level == "L2":
-                p = ist.Peptide(a)
+            elif s.level == "L2":
+                p = ist.Peptide(s)
                 p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L2.append(seq)
-            elif a.level == "L3":
-                p = ist.Peptide(a)
+            elif s.level == "L3":
+                p = ist.Peptide(s)
                 p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L3.append(seq)
-            elif a.level == "L4":
-                p = ist.Peptide(a)
+            elif s.level == "L4":
+                p = ist.Peptide(s)
                 p.annotated_translate()
                 p.multi_phase_translate()
                 seq = p.str_to_seqrec()
                 L4.append(seq)
             else:
-                print(a.id)
+                print("Orphan Read")
+            print(a.canonical_aa)
     for i in L1:
         lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
     print(f'{len(L1)} Level 1 Isoforms')
