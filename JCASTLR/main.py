@@ -31,6 +31,7 @@ def main():
     out_location = args.outpath
     g = ist.Gtf(gtf)
     b = ist.Bed(bed)
+    # define how many reads need to be looped through and level lists
     with open(fasta) as f:
         L1 = []
         L2 = []
@@ -41,7 +42,7 @@ def main():
         for line in f:
             if line.startswith(">"):
                 n += 1
-    print(fasta)
+    # loop through each record to get info and translate
     with open(fasta) as f:
         for record in SeqIO.parse(f, 'fasta'):
             # n1 += 1
@@ -51,7 +52,7 @@ def main():
             s.subset_gtf()
             s.get_meta()
             trimmed = s.annotated_trancript_trim()
-            a = ist.Cannonical_test(s)
+            a = ist.Canonical_test(s)
             a.get_canonical_aa()
             a.make_header()
             # print(a.level, a.rid, a.biotype)

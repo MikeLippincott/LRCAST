@@ -40,12 +40,11 @@ class Bed:
 # Imports GTF file as object
 class Gtf:
     def __init__(self, gtf_loc):
+        print("LOADING GTF FILES INTO PANDAS DATAFRAMES.")
+        # FLAIR output gtf
         self.gtf = read_gtf(gtf_loc)
+        # Ensembl gtf
         self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
-
-    def __str__(self):
-        str("LOADING GTF FILES INTO PANDAS DATAFRAMES.")
-
 
 # Sequence object
 class Sequences(object):
@@ -58,8 +57,13 @@ class Sequences(object):
         self.tid = self.rid.split('_')[0]
         self.gid = self.rid.split('_')[1]
         self.seq = record.seq
+
     # Subset the GTF file for transcipt of interst
     def subset_gtf(self):
+        """
+        queries the ensembl gtf for all rows belonging to gene and retrieves strand/frame (phase) information
+        :return: no return
+        """
         self.gtf0 = self.gtf.query(f'gene_id == "{self.gid}"').query('feature == "transcript"')
         self.strand = self.gtf0['strand'].unique()
         if len(self.strand) == 1:
@@ -72,80 +76,23 @@ class Sequences(object):
         else:
             self.frame == None
         # return self.id, self.strand, self.frame, self.transcript
-    # Retrive meta data for transcript
-    # def get_meta(self):
-    #
-    #     if 'ENST' in self.transcript:
-    #         # print('Canonnical', self.transcript, self.id)
-    #
-    #         enst = self.mart.query(attributes=["hgnc_symbol",
-    #                                          'chromosome_name',
-    #                                          'uniprot_gn_id',
-    #                                          'entrezgene_description'],
-    #                              filters={'link_ensembl_transcript_stable_id': self.transcript})
-    #         self.level = 'L1'
-    #         self.gene_name = str(np.unique(enst['NCBI gene (formerly Entrezgene) description'])).strip("[']")
-    #         self.gene_symbol = str(np.unique(enst['HGNC symbol'])).strip("[']")
-    #         self.chromosome = str(np.unique(enst['Chromosome/scaffold name'])).strip("[']")
-    #
-    #         if self.gene_name == float('nan'):
-    #             self.gene_name = '---'
-    #         if self.gene_symbol == float('nan'):
-    #             self.gene_symbol = '---'
-    #         if self.chromosome == float('nan'):
-    #             self.chromosome = '---'
-    #
-    #         self.uniprot = ''
-    #         for i in np.unique(enst['UniProtKB Gene Name ID']):
-    #             if str(type(i)) == "<class 'numpy.float64'>":
-    #                 if np.isnan(i):
-    #                     i = '---'
-    #             i = str(i.strip("'"))
-    #             self.uniprot += i
-    #             self.uniprot += ' '
-    #         if self.uniprot == float('nan'):
-    #             self.uniprot = '---'
-    #         # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
-    #
-    #     elif 'ENSG' in self.id:
-    #         # print('Level 1', self.transcript, self.id)
-    #         ensg = self.mart.query(attributes=["hgnc_symbol",
-    #                                          'chromosome_name',
-    #                                          'uniprot_gn_id',
-    #                                          'entrezgene_description'], filters={'link_ensembl_gene_id': self.id})
-    #         self.level = 'L2'
-    #         self.gene_name = str(np.unique(ensg['NCBI gene (formerly Entrezgene) description'])).strip("[']")
-    #         self.gene_symbol = str(np.unique(ensg['HGNC symbol'])).strip("[']")
-    #         self.chromosome = str(np.unique(ensg['Chromosome/scaffold name'])).strip("[']")
-    #
-    #         if self.gene_name == float('nan'):
-    #             self.gene_name = '---'
-    #         if self.gene_symbol == float('nan'):
-    #             self.gene_symbol = '---'
-    #         if self.chromosome == float('nan'):
-    #             self.chromosome = '---'
-    #
-    #         self.uniprot = ''
-    #         for i in np.unique(ensg['UniProtKB Gene Name ID']):
-    #             if str(type(i)) == "<class 'numpy.float64'>":
-    #                 if np.isnan(i):
-    #                     i = '---'
-    #             i = str(i.strip("'"))
-    #             self.uniprot += i
-    #             self.uniprot += ' '
-    #         # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
-    #
-    #     else:
-    #         # print('Level 2', self.transcript,self.id)
-    #         self.level = 'L3'
-    #         self.gene_name = '---'
-    #         self.gene_symbol = '---'
-    #         self.uniprot = '---'
-    #         self.chromosome = '---'
-    #         # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
 
+    # retrieve transcript or gene meta data
     def get_meta(self):
 
+        """
+        Function defines each record's level then retrieves transcript or gene meta data depending on which ensembl id
+        is available (ensembl transcript id has priority over ensembl gene id)
+        Metadata to retieve:
+        level
+        biotyep
+        gene symbol
+        gene name
+        chromosome
+        transcript support level (tsl)
+        uniprot id
+        :return: No return
+        """
         if 'ENST' in self.rid:
             enst = gget.info(self.tid)
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
@@ -301,8 +248,8 @@ class Sequences(object):
         # print(adjustedSS)
         return self.a_seq
 
-uniprot_max_retries = 10
-class Cannonical_test:
+uniprot_max_retries = 10 # Defined for number of retries for uinprot address in Canonical_tests
+class Canonical_test:
     def __init__(self,
                  sequence: Sequences):
         self.gtf_canonical_transcript = None
@@ -446,7 +393,7 @@ class Cannonical_test:
 class Peptide(object):
     def __init__(self,
                  sequence: Sequences,
-                 canonical: Cannonical_test):
+                 canonical: Canonical_test):
         sequence.subset_gtf()
         sequence.get_meta()
         canonical.make_header()
@@ -507,12 +454,22 @@ class Peptide(object):
             self.prot = d[max(d)]
         return self.prot
 
+    # TODO: write method to discern which translate method to use based upon value of seq from sequences class.
+    # TODO: also include a report to compare methods of translation?
+    def which_translate(self):
+        print("not Complete")
+
     # returns longest translated aa to a BioSeq Record object
     def str_to_seqrec(self):
         self.rec = SeqRecord(Seq(self.prot),f'{self.header}',description=self.gene_name)
         return self.rec
 
-#
+
+
+
+
+
+
 # g = Gtf("results/isoforms/test0_long.isoforms.gtf")
 # fasta = "results/isoforms/test0_long.isoforms.fa"
 
@@ -570,9 +527,6 @@ class Peptide(object):
 # print(len(L1),len(L2),len(L3),len(L4))
 #
 #
-
-
-
 
 
 
