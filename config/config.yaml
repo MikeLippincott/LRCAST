@@ -10,8 +10,7 @@ samples:
   long:
     - 'test0_long'
   short:
-    - 'test1_short'
-    - 'test2_short'
+    - 'test0_short'
 
   exp:
     'experiment_info'
@@ -22,7 +21,7 @@ genome:
   fa:
     "resources/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
 qc_list:
-  - 'test1_long'
+  - 'test0_long'
 
 
 

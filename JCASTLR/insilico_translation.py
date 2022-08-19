@@ -93,6 +93,7 @@ class Sequences(object):
         uniprot id
         :return: No return
         """
+        print(self.rid)
         if 'ENST' in self.rid:
             enst = gget.info(self.tid)
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
@@ -110,11 +111,11 @@ class Sequences(object):
             # self.gene_name = enst['protein_names'].to_list()[0]
             # print(self.gene_name[0])
             try:
-                if pd.isnull(enst['protein_names'].to_list()[0]) == True:
+                if pd.isnull(enst['protein_names'].to_list()):
                     self.gene_name = "-"
                 else:
                     self.gene_name = enst['protein_names'].to_list()[0]
-            except:
+            except ValueError:
                 self.gene_name = enst['protein_names'].to_list()[0][0]
 
             # print(self.gene_name)
@@ -143,11 +144,11 @@ class Sequences(object):
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
             try:
-                if pd.isnull(ensg['protein_names'].to_list()[0]) == True:
+                if pd.isnull(ensg['protein_names'].to_list()):
                     self.gene_name = "-"
                 else:
                     self.gene_name = ensg['protein_names'].to_list()[0]
-            except:
+            except ValueError:
                 self.gene_name = ensg['protein_names'].to_list()[0][0]
             # print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
