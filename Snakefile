@@ -21,7 +21,7 @@ if test == "Long":
             expand("results/corrected/{sample}_all_inconsistent.bed",sample=config['samples']['long']),
             expand("results/isoforms/{sample}.isoforms.{ext}",sample=config['samples']['long'],ext=["bed", "fa","gtf"]),
             expand('results/JCASTLR_output/{sample}_JCASTLR{level}.fasta', \
-                sample=config['samples']['long'],level=["canonical", "level1", "level2"])
+                sample=config['samples']['long'],level=["_Level1", "_Level2", "_Level3","_Level4"])
 elif test == "Short":
     include: "workflow/rules/align_short.smk"
     include: "workflow/rules/correct_with_short.smk"
@@ -44,6 +44,6 @@ elif test == "Short":
             expand("results/isoforms/{sample}.isoforms.{ext}",\
                 sample=config['samples']['long'],ext=["bed", "fa","gtf"]),
             expand('results/JCASTLR_output/{sample}_JCASTLR{level}.fasta',\
-                sample=config['samples']['long'],level=["canonical", "level1", "level2"])
+                sample=config['samples']['long'],level=["_Level1", "_Level2", "_Level3","_Level4"])
 else:
     print("Error, please allow a proper run_type")

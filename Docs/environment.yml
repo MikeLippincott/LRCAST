@@ -28,3 +28,4 @@ dependencies:
   - r-irkernel
   - pybiomart
   - fastq-tools
+  - gget
