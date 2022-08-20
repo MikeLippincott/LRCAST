@@ -17,6 +17,7 @@ import requests as rq
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from io import StringIO
+from time import sleep
 
 """
 Run this module with input files from the output of the FLAIR pipeline
@@ -108,6 +109,7 @@ class Sequences(object):
 
             # print(self.tid)
             enst = gget.info(self.tid)
+            sleep(0.1)
             # self.gene_name = enst['protein_names'].to_list()[0]
             # print(self.gene_name[0])
             try:
@@ -141,8 +143,10 @@ class Sequences(object):
 
             # print(self.gid)
             ensg = gget.info(self.gid)
+            sleep(0.1)
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
+            # print(ensg['protein_names'])
             try:
                 if pd.isnull(ensg['protein_names'].to_list()):
                     self.gene_name = "-"
