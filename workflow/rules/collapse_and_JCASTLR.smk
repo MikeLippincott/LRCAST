@@ -23,7 +23,7 @@ rule run_JCAST_LR:
         fa = "results/isoforms/{sample}.isoforms.fa",
         bed = "results/isoforms/{sample}.isoforms.bed"
     output:
-        'results/JCASTLR_output/{sample}_JCASTLR{level}.fasta'
+        'results/JCASTLR_output/{sample}_JCASTLR_{level}.fasta'
     params:
         prefix = "{sample}_",
         JCASTLR_path = "JCASTLR",
