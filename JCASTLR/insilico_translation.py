@@ -113,7 +113,7 @@ class Sequences(object):
             # self.gene_name = enst['protein_names'].to_list()[0]
             # print(self.gene_name[0])
 
-            if '-' in self.tid:
+            if '-' in self.rid:
                 self.gene_name = "-"
             else:
                 try:
@@ -152,7 +152,7 @@ class Sequences(object):
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
             # print(ensg['protein_names'])
-            if '-' in self.gid:
+            if '-' in self.rid:
                 self.gene_name = "-"
             else:
                 try:

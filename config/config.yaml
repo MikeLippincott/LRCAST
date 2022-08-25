@@ -8,7 +8,12 @@ runmode:
 # ex. test1_long and test1_short belong to the same sample type
 samples:
   long:
-    - 'test0_long'
+    - 'test10_long'
+    - 'test11_long'
+    - 'test12_long'
+    - 'test14_long'
+    - 'test15_long'
+    - 'test16_long'
   short:
     - 'test0_short'
 
@@ -21,8 +26,12 @@ genome:
   fa:
     "resources/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
 qc_list:
-  - 'test0_long'
-
+  - 'test10_long'
+  - 'test11_long'
+  - 'test12_long'
+  - 'test14_long'
+  - 'test15_long'
+  - 'test16_long'
 
 
 STAR_index:
