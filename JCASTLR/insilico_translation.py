@@ -113,9 +113,10 @@ class Sequences(object):
             # self.gene_name = enst['protein_names'].to_list()[0]
             # print(self.gene_name[0])
 
-            if '-' in self.rid:
-                self.gene_name = "-"
-            else:
+            try:
+                if pd.isnull(enst):
+                    self.gene_name = '-'
+            except ValueError:
                 try:
                     if pd.isnull(enst['protein_names'].to_list()):
                         self.gene_name = "-"
@@ -152,9 +153,10 @@ class Sequences(object):
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
             # print(ensg['protein_names'])
-            if '-' in self.rid:
-                self.gene_name = "-"
-            else:
+            try:
+                if pd.isnull(ensg):
+                    self.gene_name = '-'
+            except ValueError:
                 try:
                     if pd.isnull(ensg['protein_names'].to_list()):
                         self.gene_name = "-"
@@ -163,6 +165,7 @@ class Sequences(object):
                 except ValueError:
                     # gene_name = "-"
                     self.gene_name = ensg['protein_names'].to_list()[0][0]
+
             # print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
