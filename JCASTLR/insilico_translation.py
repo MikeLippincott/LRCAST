@@ -96,7 +96,7 @@ class Sequences(object):
         """
         print(self.rid)
         if 'ENST' in self.rid:
-            enst = gget.info(self.gid)
+            enst = gget.info(self.tid)
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
             if len(gtf0) > 0:
                 self.level = "L1"
@@ -121,6 +121,21 @@ class Sequences(object):
                 except ValueError:
                     # gene_name = "-"
                     self.gene_name = enst['protein_names'].to_list()[0][0]
+
+            if self.gene_name == '-':
+                enst = gget.info(self.gid)
+                try:
+                    if pd.isnull(enst):
+                        self.gene_name = '-'
+                except ValueError:
+                    try:
+                        if pd.isnull(enst['protein_names'].to_list()):
+                            self.gene_name = "-"
+                        else:
+                            self.gene_name = enst['protein_names'].to_list()[0]
+                    except ValueError:
+                        # gene_name = "-"
+                        self.gene_name = enst['protein_names'].to_list()[0][0]
 
             # print(self.gene_name)
             self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
@@ -474,6 +489,7 @@ class Peptide(object):
 
     # returns longest translated aa to a BioSeq Record object
     def str_to_seqrec(self):
+        print(self.gene_name)
         self.rec = SeqRecord(Seq(self.prot),f'{self.header}',description=self.gene_name)
         return self.rec
 
