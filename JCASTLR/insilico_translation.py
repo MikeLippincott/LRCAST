@@ -96,7 +96,7 @@ class Sequences(object):
         """
         print(self.rid)
         if 'ENST' in self.rid:
-            enst = gget.info(self.tid)
+            enst = gget.info(self.gid)
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
             if len(gtf0) > 0:
                 self.level = "L1"
@@ -107,11 +107,7 @@ class Sequences(object):
             else:
                 print("Check Meta Data method in Sequences Class")
 
-            # print(self.tid)
-            enst = gget.info(self.tid)
             sleep(0.1)
-            # self.gene_name = enst['protein_names'].to_list()[0]
-            # print(self.gene_name[0])
 
             try:
                 if pd.isnull(enst):
