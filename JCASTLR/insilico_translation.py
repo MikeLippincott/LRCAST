@@ -137,7 +137,7 @@ class Sequences(object):
                         # gene_name = "-"
                         self.gene_name = enst['protein_names'].to_list()[0][0]
 
-            # print(self.gene_name)
+            print(self.gene_name)
             self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0:
@@ -177,7 +177,7 @@ class Sequences(object):
                     # gene_name = "-"
                     self.gene_name = ensg['protein_names'].to_list()[0][0]
 
-            # print(self.gene_name)
+            print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             self.uniprot = ensg['uniprot_id'].to_list()[0]
@@ -198,6 +198,10 @@ class Sequences(object):
 
         else:
             print('LRCAST: RNA Fasta Header Read Error!')
+
+        if pd.isnull(self.gene_name):
+            self.gene_name = '-'
+
 
     def annotated_trancript_trim(self):
         """

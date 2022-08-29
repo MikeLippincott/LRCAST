@@ -51,7 +51,7 @@ def main():
             s = ist.Sequences(g, r)
             s.subset_gtf()
             s.get_meta()
-            trimmed = s.annotated_trancript_trim()
+            # trimmed = s.annotated_trancript_trim()
             a = ist.Canonical_test(s)
             a.get_canonical_aa()
             a.make_header()
