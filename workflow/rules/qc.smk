@@ -22,3 +22,17 @@ rule multiqc:
         "results/logs/qc/multiqc.log"
     wrapper:
         "v1.3.2/bio/multiqc"
+
+rule run_qualimap:
+    input:
+        gtf = "resources/genome/Homo_sapiens.GRCh38.107.gtf",
+        bams = expand("results/aligned/long/{sample}.bam",sample=config['samples']['long'])
+    output:
+        o1 = "results/qc/qualimap/qualimapReport.html",
+        o2 = "results/qc/qualimap/rnaseq_qc_results.txt"
+    params:
+        outpath = "results/qc/qualimap/",
+        mem = "8G"
+    shell:
+        "qualimap rnaseq -outdir {params.outpath} -a proportional \
+        -bam {input.bams} -gtf {input.gtf} --java-mem-size={params.mem}"

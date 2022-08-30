@@ -6,6 +6,7 @@ configfile: "config/config.yaml"
 include: "workflow/rules/qc.smk"
 include: "workflow/rules/align_long.smk"
 include: "workflow/rules/collapse_and_JCASTLR.smk"
+include: "workflow/rules/counts.smk"
 
 test = config["runmode"]
 
@@ -21,10 +22,14 @@ if test == "Long":
             expand("results/corrected/{sample}_all_inconsistent.bed",sample=config['samples']['long']),
             expand("results/isoforms/{sample}.isoforms.{ext}",sample=config['samples']['long'],ext=["bed", "fa","gtf"]),
             expand('results/JCASTLR_output/{sample}_JCASTLR_{level}.fasta', \
-                sample=config['samples']['long'],level=["Level1", "Level2", "Level3","Level4"])
+                sample=config['samples']['long'],level=["Level1", "Level2", "Level3","Level4","Level5"]),
+            "results/DGE/featurecounts.txt",
+            'DGE/normalized_counts.txt'
+
 elif test == "Short":
     include: "workflow/rules/align_short.smk"
     include: "workflow/rules/correct_with_short.smk"
+    include: "workflow/rules/counts.smk"
     rule all:
         input:
             expand("results/qc/{qc_sample}.html",qc_sample=config['qc_list']),
@@ -44,6 +49,8 @@ elif test == "Short":
             expand("results/isoforms/{sample}.isoforms.{ext}",\
                 sample=config['samples']['long'],ext=["bed", "fa","gtf"]),
             expand('results/JCASTLR_output/{sample}_JCASTLR_{level}.fasta',\
-                sample=config['samples']['long'],level=["Level1", "Level2", "Level3","Level4"])
+                sample=config['samples']['long'],level=["Level1", "Level2", "Level3","Level4","Level5"]),
+            "results/DGE/featurecounts.txt",
+            'DGE/normalized_counts.txt'
 else:
     print("Error, please allow a proper run_type")

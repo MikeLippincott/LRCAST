@@ -1,17 +1,3 @@
-rule run_qualimap:
-    input:
-        gtf = "resources/genome/Homo_sapiens.GRCh38.107.gtf",
-        bams = expand("results/aligned/long/{sample}.bam",sample=config['samples']['long'])
-    output:
-        o1 = "results/qc/qualimap/qualimapReport.html",
-        o2 = "results/qc/qualimap/rnaseq_qc_results.txt"
-    params:
-        outpath = "results/qc/qualimap/",
-        mem = "8G"
-    shell:
-        "qualimap rnaseq -outdir {params.outpath} -a proportional \
-        -bam {input.bams} -gtf {input.gtf} --java-mem-size={params.mem}"
-
 
 rule count_matrix_generation:
     input:
@@ -20,6 +6,17 @@ rule count_matrix_generation:
     output:
         out = "results/DGE/featurecounts.txt"
     log:
-        "results/logs/DGE/featurecounts.txt"
+        "results/logs/DGE/featurecounts_log.txt"
     shell:
         "featureCounts -L -T 4 -a {input.gtf} -o {output.out} {input.bams} > {log}"
+
+rule run_DESeq2:
+    input:
+        meta = "resources/meta.txt",
+        counts = "results/DGE/featurecounts.txt"
+    output:
+        'DGE/normalized_counts.txt'
+    shell:
+        r"""
+        scripts/DESeq2_DGE.R -i {input.counts} -m {input.meta} -o {output}
+        """
