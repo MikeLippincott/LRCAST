@@ -33,10 +33,12 @@ def main():
     b = ist.Bed(bed)
     # define how many reads need to be looped through and level lists
     with open(fasta) as f:
+        Canonical = []
         L1 = []
         L2 = []
         L3 = []
         L4 = []
+        L5 = []
         n = 0
         n1 = 0
         for line in f:
@@ -51,35 +53,47 @@ def main():
             s = ist.Sequences(g, r)
             s.subset_gtf()
             s.get_meta()
-            # trimmed = s.annotated_trancript_trim()
+            conditions = ['Canonical','L1']
+            if any(conditions) and not all(conditions):
+                s.annotated_trancript_trim()
             a = ist.Canonical_test(s)
             a.get_canonical_aa()
             a.make_header()
             # print(a.level, a.rid, a.biotype)
-            if s.level == "L1":
+            if s.level == "Canonical":
+                # s.annotated_trancript_trim()
+                p = ist.Peptide(s, a)
+                prot_seq = p.annotated_translate()
+                seq = p.str_to_seqrec(prot_seq)
+                Canonical.append(seq)
+            elif s.level == "L1":
+                s.annotated_trancript_trim()
                 p = ist.Peptide(s,a)
-                p.annotated_translate()
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
+                prot_seq = p.annotated_translate()
+                seq = p.str_to_seqrec(prot_seq)
                 L1.append(seq)
             elif s.level == "L2":
+                # s.annotated_trancript_trim()
                 p = ist.Peptide(s,a)
-                p.annotated_translate()
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
+                prot_seq = p.multi_phase_translate()
+                seq = p.str_to_seqrec(prot_seq)
                 L2.append(seq)
             elif s.level == "L3":
                 p = ist.Peptide(s,a)
-                p.annotated_translate()
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
+                prot_seq = p.multi_phase_translate()
+                seq = p.str_to_seqrec(prot_seq)
                 L3.append(seq)
             elif s.level == "L4":
                 p = ist.Peptide(s,a)
-                p.annotated_translate()
-                p.multi_phase_translate()
-                seq = p.str_to_seqrec()
+                prot_seq = p.multi_phase_translate()
+                seq = p.str_to_seqrec(prot_seq)
                 L4.append(seq)
+            elif s.level == "L5":
+                p = ist.Peptide(s, a)
+                prot_seq = p.multi_phase_translate()
+                seq = p.str_to_seqrec(prot_seq)
+                L5.append(seq)
+
             else:
                 print("Orphan Read")
             print(a.canonical_aa)

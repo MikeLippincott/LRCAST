@@ -154,7 +154,7 @@ class Sequences(object):
                 self.biotype = "protein_coding"
             elif len(gtf0) == 0:
                 self.biotype = np.unique(self.gtf_file.query(f'gene_id == "{self.gid}"')['transcript_biotype'])
-                self.level = "L3"
+                self.level = "L4"
             else:
                 print("Check Meta Data method in Sequences Class")
 
@@ -188,13 +188,13 @@ class Sequences(object):
             # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
 
         elif not "ENSG" in self.rid:
-            self.level = "L4"
-            self.biotype = "L4"
-            self.gene_name = "L4"
-            self.gene_symbol = "L4"
+            self.level = "L5"
+            self.biotype = "L5"
+            self.gene_name = "L5"
+            self.gene_symbol = "L5"
             self.chromosome = self.gtf0['seqname'].to_list()[0]
-            self.uniprot = "L4"
-            self.tsl = "L4"
+            self.uniprot = "L5"
+            self.tsl = "L5"
 
         else:
             print('LRCAST: RNA Fasta Header Read Error!')
@@ -202,12 +202,8 @@ class Sequences(object):
         if pd.isnull(self.gene_name):
             self.gene_name = '-'
 
-
     def annotated_trancript_trim(self):
         """
-        :transcript_id: ensembl transcript_id
-        :gtf: df from GTF ensembl
-        :jcast: df from GTF flair output
         :return: trimmed sequence for insilico translation
         """
         gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
@@ -273,6 +269,7 @@ class Sequences(object):
                 i += 1
             adjustedSS = (SS - (t_len))
         self.a_seq = (str(self.seq[adjustedSS:]))
+        print(self.a_seq)
         # print(start, end)
         # print(e)
         # print(SS)
@@ -299,7 +296,7 @@ class Canonical_test:
         if len(self.canonical_aa[:]) == 0:
             self.canonical_aa = self.get_canonical_aa_uniprot(reviewed='false')
 
-        print(str(self.canonical_aa))
+        # print(str(self.canonical_aa))
 
         # if str(self.canonical_aa.seq) == '':
         #     self.canonical = 'Iso'
@@ -426,8 +423,10 @@ class Peptide(object):
     def __init__(self,
                  sequence: Sequences,
                  canonical: Canonical_test):
-        sequence.subset_gtf()
-        sequence.get_meta()
+        # sequence.subset_gtf()
+        # sequence.get_meta()
+        # sequence.annotated_trancript_trim()
+        self.sequence = sequence
         canonical.make_header()
         self.seq = str(sequence.seq)
         self.strand = sequence.strand
@@ -437,14 +436,13 @@ class Peptide(object):
 
     def annotated_translate(self):
         """
-        :nt: input nucleotide sequence
-        :phase: integer 0-2 which phase to translate in
+        used the trimmed sequence to translate from start codon
         :return: peptide from annotation coordinates
         """
         code = constants.genetic_code
         pep = ''
-        for i in range(self.frame, len(self.seq) - 2, 3):
-            aa = code[self.seq[i:i + 3]]
+        for i in range(len(self.seq) - 2, 3):
+            aa = code[self.sequence.a_seq[i:i + 3]]
             if aa == 'X':
                 return pep
             else:
@@ -492,74 +490,7 @@ class Peptide(object):
         print("not Complete")
 
     # returns longest translated aa to a BioSeq Record object
-    def str_to_seqrec(self):
+    def str_to_seqrec(self, prot_seq):
         print(self.gene_name)
-        self.rec = SeqRecord(Seq(self.prot),f'{self.header}',description=self.gene_name)
+        self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.gene_name)
         return self.rec
-
-
-
-
-
-
-
-# g = Gtf("results/isoforms/test0_long.isoforms.gtf")
-# fasta = "results/isoforms/test0_long.isoforms.fa"
-
-#
-#
-# f1 = 0
-# f2 = 0
-# both = 0
-# no_start = 0
-# L1 = []
-# L2 = []
-# L3 = []
-# L4 = []
-# uniprot_max_retries = 10
-#
-# with open(fasta) as f:
-#     for record in SeqIO.parse(f, 'fasta'):
-#         # n1 += 1
-#         # lrf.progress_bar(n1, n, 50)
-#         r = record
-#         s = Sequences(g, r)
-#         s.subset_gtf()
-#         s.get_meta()
-#         trimmed = s.annotated_trancript_trim()
-#         s.make_header()
-#         a = Cannonical_test(s)
-#         a.get_canonical_aa()
-#         # print(a.level, a.rid, a.biotype)
-#         if s.level == "L1":
-#             p = Peptide(s)
-#             p.annotated_translate()
-#             p.multi_phase_translate()
-#             seq = p.str_to_seqrec()
-#             L1.append(seq)
-#         elif s.level == "L2":
-#             p = Peptide(s)
-#             p.annotated_translate()
-#             p.multi_phase_translate()
-#             seq = p.str_to_seqrec()
-#             L2.append(seq)
-#         elif s.level == "L3":
-#             p = Peptide(s)
-#             p.annotated_translate()
-#             p.multi_phase_translate()
-#             seq = p.str_to_seqrec()
-#             L3.append(seq)
-#         elif a.level == "L4":
-#             p = Peptide(s)
-#             p.annotated_translate()
-#             p.multi_phase_translate()
-#             seq = p.str_to_seqrec()
-#             L4.append(seq)
-#         else:
-#             print("Orphan Read")
-# print(len(L1),len(L2),len(L3),len(L4))
-#
-#
-
-
-
