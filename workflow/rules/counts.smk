@@ -1,7 +1,7 @@
 
 rule count_matrix_generation:
     input:
-        bams = expand("results/aligned/long/{sample}.bam",sample=config['samples']['long']),
+        bams = 'results/aligned/long/aligned.bam',
         gtf = "resources/genome/Homo_sapiens.GRCh38.107.gtf"
     output:
         out = "results/DGE/featurecounts.txt"
@@ -12,11 +12,11 @@ rule count_matrix_generation:
 
 rule run_DESeq2:
     input:
-        meta = "resources/meta.txt",
+        meta = "resources/experiment/meta.csv",
         counts = "results/DGE/featurecounts.txt"
     output:
-        'DGE/normalized_counts.txt'
+        'results/DGE/normalized_counts.txt'
     shell:
-        r"""
-        scripts/DESeq2_DGE.R -i {input.counts} -m {input.meta} -o {output}
+        """
+        Rscript scripts/DESeq2_DGE.R -i {input.counts} -m {input.meta} -o {output}
         """

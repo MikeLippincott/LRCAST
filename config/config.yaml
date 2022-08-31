@@ -14,6 +14,7 @@ samples:
     - 'test14_long'
     - 'test15_long'
     - 'test16_long'
+
   short:
     - 'test0_short'
 
@@ -32,6 +33,7 @@ qc_list:
   - 'test14_long'
   - 'test15_long'
   - 'test16_long'
+
 
 
 STAR_index:
