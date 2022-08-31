@@ -283,6 +283,7 @@ class Canonical_test:
                  sequence: Sequences):
         self.gtf_canonical_transcript = None
         self.gtf_alternative_transcripts = None
+        self.canonical_aa = SeqRecord(Seq(''))
         self.s = sequence
         self.logger = logging.getLogger('jcast.seq')
         # self.canonical_aa = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})

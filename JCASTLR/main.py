@@ -56,39 +56,56 @@ def main():
             conditions = ['Canonical','L1']
             if any(conditions) and not all(conditions):
                 s.annotated_trancript_trim()
-            a = ist.Canonical_test(s)
-            a.get_canonical_aa()
-            a.make_header()
+            # a = ist.Canonical_test(s)
+            # a.get_canonical_aa()
+            # a.make_header()
             # print(a.level, a.rid, a.biotype)
             if s.level == "Canonical":
+                a = ist.Canonical_test(s)
+                a.get_canonical_aa()
+                a.make_header()
                 # s.annotated_trancript_trim()
                 p = ist.Peptide(s, a)
                 prot_seq = p.annotated_translate()
                 seq = p.str_to_seqrec(prot_seq)
                 Canonical.append(seq)
             elif s.level == "L1":
+                a = ist.Canonical_test(s)
+                a.get_canonical_aa()
+                a.make_header()
                 s.annotated_trancript_trim()
                 p = ist.Peptide(s,a)
                 prot_seq = p.annotated_translate()
                 seq = p.str_to_seqrec(prot_seq)
                 L1.append(seq)
             elif s.level == "L2":
+                a = ist.Canonical_test(s)
+                a.get_canonical_aa()
+                a.make_header()
                 # s.annotated_trancript_trim()
                 p = ist.Peptide(s,a)
                 prot_seq = p.multi_phase_translate()
                 seq = p.str_to_seqrec(prot_seq)
                 L2.append(seq)
             elif s.level == "L3":
+                a = ist.Canonical_test(s)
+                a.get_canonical_aa()
+                a.make_header()
                 p = ist.Peptide(s,a)
                 prot_seq = p.multi_phase_translate()
                 seq = p.str_to_seqrec(prot_seq)
                 L3.append(seq)
             elif s.level == "L4":
+                a = ist.Canonical_test(s)
+                a.get_canonical_aa()
+                a.make_header()
                 p = ist.Peptide(s,a)
                 prot_seq = p.multi_phase_translate()
                 seq = p.str_to_seqrec(prot_seq)
                 L4.append(seq)
             elif s.level == "L5":
+                a = ist.Canonical_test(s)
+                a.make_header()
                 p = ist.Peptide(s, a)
                 prot_seq = p.multi_phase_translate()
                 seq = p.str_to_seqrec(prot_seq)
@@ -109,6 +126,9 @@ def main():
     for i in L4:
         lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
     print(f'{len(L4)} Level 4 Isoforms')
+    for i in L5:
+        lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
+    print(f'{len(L5)} Level 5 Isoforms')
 
 
 

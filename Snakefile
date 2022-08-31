@@ -26,7 +26,7 @@ if test == "Long":
             # expand('results/JCASTLR_output/{sample}_JCASTLR_{level}.fasta', \
             #     sample=config['samples']['long'],level=["Level1", "Level2", "Level3","Level4","Level5"]),
             # "results/DGE/featurecounts.txt",
-            # 'results/DGE/normalized_counts.txt',
+            'results/DGE/normalized_counts.txt',
             # "results/qc/qualimap/qualimapReport.html",
             # "results/qc/qualimap/rnaseq_qc_results.txt"
             'results/DGE/counts_matrix.tsv',
