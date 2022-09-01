@@ -47,8 +47,8 @@ def main():
     # loop through each record to get info and translate
     with open(fasta) as f:
         for record in SeqIO.parse(f, 'fasta'):
-            # n1 += 1
-            # lrf.progress_bar(n1, n, 50)
+            n1 += 1
+            lrf.progress_bar(n1, n, 50)
             r = record
             s = ist.Sequences(g, r)
             s.subset_gtf()
@@ -75,11 +75,12 @@ def main():
                 # a = ist.Canonical_test(s)
                 # a.get_canonical_aa()
                 # a.make_header()
-                # s.annotated_trancript_trim()
+                s.annotated_trancript_trim()
                 p = ist.Peptide(s)
                 prot_seq = p.annotated_translate()
                 p.get_canonical_aa_uniprot_local()
                 p.make_header()
+                # print(prot_seq)
                 seq = p.str_to_seqrec(prot_seq)
                 L1.append(seq)
             elif s.level == "L2":
@@ -125,10 +126,38 @@ def main():
 
             else:
                 print("Orphan Read")
-    print(L1)
-    print(L2)
+            ph = ist.Post_hoc_reassignment(s,p)
+            ph.get_canonical_aa_uniprot_local()
+            ph.make_header()
+            # post hoc change of level
+            if ph.level == 'Canonical':
+                if ph.old == 'L1':
+
+                    val = L1[-1]
+                    # print("here   ",val)
+                    Canonical.append(val)
+                    L1 = L1[:-1]
+                elif ph.old == 'L2':
+                    val = L2[-1]
+                    Canonical.append(val)
+                    L2 = L2[:-1]
+                elif ph.old == 'L3':
+                    val = L3[-1]
+                    Canonical.append(val)
+                    L3 = L3[:-1]
+                elif ph.old == 'L4':
+                    val = L4[-1]
+                    Canonical.append(val)
+                    L4 = L4[:-1]
+                elif ph.old == 'L5':
+                    val = L5[-1]
+                    Canonical.append(val)
+                    L5 = L5[:-1]
+                else:
+                    print("error post hoc")
+
     for i in Canonical:
-        lrf.prot_to_fasta(i, out_location, prefix, "Canonical")
+        lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
     print(f'{len(Canonical)} Canonical Isoforms')
     for i in L1:
         lrf.prot_to_fasta(i, out_location, prefix,"_Level1")

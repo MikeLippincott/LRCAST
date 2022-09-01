@@ -225,6 +225,7 @@ class Sequences(object):
             y2 = TSS['end'].to_list()[0]
         elif len(TSS) == 0:
             print("No Annotated Start Codon")
+            self.a_seq = ''
             return None
         if strand == '+':
             SS = y1 - x1
@@ -442,6 +443,7 @@ class Peptide(object):
         self.frame = sequence.frame
         self.gene_name = sequence.gene_name
         self.level = sequence.level
+        self.a_seq = ''
 
     def annotated_translate(self):
         """
@@ -450,12 +452,13 @@ class Peptide(object):
         """
         code = constants.genetic_code
         self.prot = ''
-        for i in range(len(self.seq) - 2, 3):
+        for i in range(0,len(self.sequence.a_seq) - 2, 3):
             aa = code[self.sequence.a_seq[i:i + 3]]
             if aa == 'X':
                 return self.prot
             else:
                 self.prot += aa
+        print(self.prot)
         return self.prot
 
     @staticmethod
@@ -506,6 +509,45 @@ class Peptide(object):
         print(self.canonical_aa)
 
     def make_header(self):
+        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
+            f'LRCAST{self.s.level}',
+            self.s.uniprot,
+            self.s.gene_symbol,
+            self.s.gid,
+            self.s.tid,
+            self.s.strand,
+            f'Chr{self.s.chromosome}',
+            self.s.biotype,
+            self.s.tsl,
+            self.s.level, )
+
+
+    # returns longest translated aa to a BioSeq Record object
+    def str_to_seqrec(self, prot_seq):
+        self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.gene_name)
+        return self.rec
+
+class Post_hoc_reassignment():
+    def __init__(self,
+                 sequence:Sequences,
+                 peptide: Peptide):
+        self.s = sequence
+        self.p = peptide
+        self.level = self.s.level
+
+    def get_canonical_aa_uniprot_local(self,
+                                       ) -> SeqRecord:
+        self.canonical_aa = ''
+        self.old = self.level
+        with open('resources/DB/reviewed_canonical.fasta') as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                if record.seq == self.p.prot:
+                    self.level = 'Canonical'
+                    self.canonical_aa = record.id
+        print(self.old, ' ', self.level)
+        # print(self.canonical_aa)
+
+    def make_header(self):
         if self.level == 'Canonical':
             self.header = self.canonical_aa + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
                 self.s.uniprot,
@@ -518,20 +560,4 @@ class Peptide(object):
                 self.s.tsl,
                 self.s.level, )
         else:
-            self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
-                f'LRCAST{self.s.level}',
-                self.s.uniprot,
-                self.s.gene_symbol,
-                self.s.gid,
-                self.s.tid,
-                self.s.strand,
-                f'Chr{self.s.chromosome}',
-                self.s.biotype,
-                self.s.tsl,
-                self.s.level, )
-
-
-    # returns longest translated aa to a BioSeq Record object
-    def str_to_seqrec(self, prot_seq):
-        self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.gene_name)
-        return self.rec
+            self.header = self.p.header

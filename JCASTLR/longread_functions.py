@@ -72,8 +72,6 @@ def prot_to_fasta(seqrecord,
     with open(outfile, 'a') as output_handle:
         SeqIO.write(seqrecord, output_handle, 'fasta')
 
-    print(seqrecord)
-
 # progress bar for run time estimation
 def progress_bar(current,
                  total,
