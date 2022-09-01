@@ -47,6 +47,7 @@ class Gtf:
         # Ensembl gtf
         self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
 
+
 # Sequence object
 class Sequences(object):
     def __init__(self,
@@ -137,7 +138,7 @@ class Sequences(object):
                         # gene_name = "-"
                         self.gene_name = enst['protein_names'].to_list()[0][0]
 
-            print(self.gene_name)
+            # print(self.gene_name)
             self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0:
@@ -177,7 +178,7 @@ class Sequences(object):
                     # gene_name = "-"
                     self.gene_name = ensg['protein_names'].to_list()[0][0]
 
-            print(self.gene_name)
+            # print(self.gene_name)
             self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             self.uniprot = ensg['uniprot_id'].to_list()[0]
@@ -277,163 +278,170 @@ class Sequences(object):
         # print(adjustedSS)
         return self.a_seq
 
-uniprot_max_retries = 10 # Defined for number of retries for uinprot address in Canonical_tests
-class Canonical_test:
-    def __init__(self,
-                 sequence: Sequences):
-        self.gtf_canonical_transcript = None
-        self.gtf_alternative_transcripts = None
-        self.canonical_aa = SeqRecord(Seq(''))
-        self.s = sequence
-        self.logger = logging.getLogger('jcast.seq')
-        # self.canonical_aa = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})
+# uniprot_max_retries = 10 # Defined for number of retries for uinprot address in Canonical_tests
+# class Canonical_test:
+#     def __init__(self,
+#                  sequence: Sequences):
+#         self.gtf_canonical_transcript = None
+#         self.gtf_alternative_transcripts = None
+#         self.canonical_aa = SeqRecord(Seq(''))
+#         self.s = sequence
+#         self.logger = logging.getLogger('jcast.seq')
+#         # self.canonical_aa = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})
+#
+    # def get_canonical_aa(self):
+    #     """
+    #     :return: True
+    #     """
+    #
+    #     self.canonical_aa = self.get_canonical_aa_uniprot(reviewed='true')
+    #     if len(self.canonical_aa[:]) == 0:
+    #         self.canonical_aa = self.get_canonical_aa_uniprot(reviewed='false')
+    #
+    #     # print(str(self.canonical_aa))
+    #
+    #     # if str(self.canonical_aa.seq) == '':
+    #     #     self.canonical = 'Iso'
+    #     # else:
+    #     #     self.canonical = 'Canonical'
+    #     # self.s.header += f'{canonical}|'
+    #     # print(self.canonical_aa.id,self.canonical_aa.seq,self.canonical_aa.description)
+    #
+    #     return True
 
-    def get_canonical_aa(self):
-        """
-        :return: True
-        """
+    # def get_canonical_aa_uniprot_local(self,
+    #                                    ) -> SeqRecord:
+    #     with open('resources/DB/reviewed_canonical.fasta') as f:
+    #         for record in SeqIO.parse(f, 'fasta'):
+    #             if record.seq == self.
+    #     record = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})
 
-        self.canonical_aa = self.get_canonical_aa_uniprot(reviewed='true')
-        if len(self.canonical_aa[:]) == 0:
-            self.canonical_aa = self.get_canonical_aa_uniprot(reviewed='false')
 
-        # print(str(self.canonical_aa))
+    # def get_canonical_aa_uniprot(self,
+    #                              reviewed='true',
+    #                              ) -> SeqRecord:
+    #
+    #     """
+    #     get the canonical sequences from Uniprot
+    #     :param reviewed: get only reviewed sequence
+    #     :return: canonical aa seqrecord
+    #     """
+    #
+    #     record = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})
+    #
+    #     # cache retrieved sequences if available, otherwise retrieve from Ensembl
+    #     cache = self.s.gid
+    #
+    #     # Create cache folder if not exists
+    #     if not os.path.exists('cache'):
+    #         os.makedirs('cache')
+    #
+    #     con = sq.connect(os.path.join('cache', 'uniprot-cache.db'))
+    #     cur = con.cursor()
+    #     cur.execute('''CREATE TABLE IF NOT EXISTS sequences(pk INTEGER PRIMARY KEY, id TEXT, seq TEXT)''')
+    #
+    #     cur.execute('''SELECT id, seq FROM sequences WHERE id=:cache''',
+    #                 {'cache': cache})
+    #     read_fasta = cur.fetchone()
+    #
+    #     if read_fasta:
+    #         record = list(SeqIO.parse(StringIO(read_fasta[1]), 'fasta'))[0]
+    #         self.logger.info('Locally cached sequence retrieved for {0}.'.format(cache))
+    #         con.close()
+    #
+    #     else:
+    #
+    #         server = 'https://www.ebi.ac.uk'
+    #
+    #         # Uniprot does not support transcript version
+    #         ext = '/proteins/api/proteins/Ensembl:' + re.sub('\\..*', '', self.s.gid) + \
+    #               '?offset=0&size=1&reviewed=' + reviewed + '&isoform=0'
+    #
+    #         self.logger.info('Sequence not cached locally. Attempting to get from Uniprot: {0}'.format(
+    #             server + ext
+    #         ))
+    #
+    #         retries = Retry(total=uniprot_max_retries,
+    #                         backoff_factor=0.1,
+    #                         status_forcelist=[500, 502, 503, 504])
+    #
+    #         rqs = rq.Session()
+    #         rqs.mount('https://', HTTPAdapter(max_retries=retries))
+    #         ret = rqs.get(server + ext, headers={"Accept": "text/x-fasta"})
+    #
+    #         if not ret.ok:
+    #             self.logger.warning('Failed retrieval for {0} after {1} retries.'.format(self.s.gid,
+    #                                                                                      uniprot_max_retries)
+    #                                 )
+    #             con.close()  # TODO: change to with statement
+    #
+    #         if ret.status_code == 200 and ret.text != '':
+    #             record = list(SeqIO.parse(StringIO(ret.text), 'fasta'))[0]
+    #
+    #             # TODO: Catch sqlite3.OperationalError if writing fails, such as in a remote volume.
+    #             cur.execute('''INSERT INTO sequences(id, seq) VALUES(:id, :seq)''',
+    #                         {'id': cache, 'seq': record.format('fasta')})
+    #             con.commit()
+    #             con.close()
+    #             self.logger.info('Sequence retrieved from Uniprot and written into local cache.')
+    #
+    #         elif ret.status_code == 200 and ret.text == '':
+    #             self.logger.info('Retrieved empty fasta from Ensembl for {0}'.format(self.s.gid))
+    #             # TODO: A known issue where Uniprot sequences do not exist for some Ensembl genes
+    #             # TODO: Rather than fix this we will simply use the GTF in future versions.
+    #             con.close()
+    #
+    #         elif ret.status_code != 200:
+    #             self.logger.warning('Retrieval of protein sequence failed.')
+    #             con.close()
+    #
+    #         else:
+    #             con.close()
+    #             pass
+    #
+    #     return record
 
-        # if str(self.canonical_aa.seq) == '':
-        #     self.canonical = 'Iso'
-        # else:
-        #     self.canonical = 'Canonical'
-        # self.s.header += f'{canonical}|'
-        # print(self.canonical_aa.id,self.canonical_aa.seq,self.canonical_aa.description)
-
-        return True
-
-    def get_canonical_aa_uniprot(self,
-                                 reviewed='true',
-                                 ) -> SeqRecord:
-
-        """
-        get the canonical sequences from Uniprot
-        :param reviewed: get only reviewed sequence
-        :return: canonical aa seqrecord
-        """
-
-        record = SeqRecord(Seq(''), annotations={'molecule_type': 'extended_protein'})
-
-        # cache retrieved sequences if available, otherwise retrieve from Ensembl
-        cache = self.s.gid
-
-        # Create cache folder if not exists
-        if not os.path.exists('cache'):
-            os.makedirs('cache')
-
-        con = sq.connect(os.path.join('cache', 'uniprot-cache.db'))
-        cur = con.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS sequences(pk INTEGER PRIMARY KEY, id TEXT, seq TEXT)''')
-
-        cur.execute('''SELECT id, seq FROM sequences WHERE id=:cache''',
-                    {'cache': cache})
-        read_fasta = cur.fetchone()
-
-        if read_fasta:
-            record = list(SeqIO.parse(StringIO(read_fasta[1]), 'fasta'))[0]
-            self.logger.info('Locally cached sequence retrieved for {0}.'.format(cache))
-            con.close()
-
-        else:
-
-            server = 'https://www.ebi.ac.uk'
-
-            # Uniprot does not support transcript version
-            ext = '/proteins/api/proteins/Ensembl:' + re.sub('\\..*', '', self.s.gid) + \
-                  '?offset=0&size=1&reviewed=' + reviewed + '&isoform=0'
-
-            self.logger.info('Sequence not cached locally. Attempting to get from Uniprot: {0}'.format(
-                server + ext
-            ))
-
-            retries = Retry(total=uniprot_max_retries,
-                            backoff_factor=0.1,
-                            status_forcelist=[500, 502, 503, 504])
-
-            rqs = rq.Session()
-            rqs.mount('https://', HTTPAdapter(max_retries=retries))
-            ret = rqs.get(server + ext, headers={"Accept": "text/x-fasta"})
-
-            if not ret.ok:
-                self.logger.warning('Failed retrieval for {0} after {1} retries.'.format(self.s.gid,
-                                                                                         uniprot_max_retries)
-                                    )
-                con.close()  # TODO: change to with statement
-
-            if ret.status_code == 200 and ret.text != '':
-                record = list(SeqIO.parse(StringIO(ret.text), 'fasta'))[0]
-
-                # TODO: Catch sqlite3.OperationalError if writing fails, such as in a remote volume.
-                cur.execute('''INSERT INTO sequences(id, seq) VALUES(:id, :seq)''',
-                            {'id': cache, 'seq': record.format('fasta')})
-                con.commit()
-                con.close()
-                self.logger.info('Sequence retrieved from Uniprot and written into local cache.')
-
-            elif ret.status_code == 200 and ret.text == '':
-                self.logger.info('Retrieved empty fasta from Ensembl for {0}'.format(self.s.gid))
-                # TODO: A known issue where Uniprot sequences do not exist for some Ensembl genes
-                # TODO: Rather than fix this we will simply use the GTF in future versions.
-                con.close()
-
-            elif ret.status_code != 200:
-                self.logger.warning('Retrieval of protein sequence failed.')
-                con.close()
-
-            else:
-                con.close()
-                pass
-
-        return record
-
-    def make_header(self):
-        if str(self.canonical_aa.seq) == '':
-            self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
-                f'LRCAST{self.s.level}',
-                self.s.uniprot,
-                self.s.gene_symbol,
-                self.s.gid,
-                self.s.tid,
-                self.s.strand,
-                f'Chr{self.s.chromosome}',
-                self.s.biotype,
-                self.s.tsl,
-                self.s.level, )
-        else:
-            self.header = self.canonical_aa.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
-                self.s.uniprot,
-                self.s.gene_symbol,
-                self.s.gid,
-                self.s.tid,
-                self.s.strand,
-                f'Chr{self.s.chromosome}',
-                self.s.biotype,
-                self.s.tsl,
-                self.s.level, )
+    # def make_header(self):
+    #     if str(self.canonical_aa.seq) == '':
+    #         self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
+    #             f'LRCAST{self.s.level}',
+    #             self.s.uniprot,
+    #             self.s.gene_symbol,
+    #             self.s.gid,
+    #             self.s.tid,
+    #             self.s.strand,
+    #             f'Chr{self.s.chromosome}',
+    #             self.s.biotype,
+    #             self.s.tsl,
+    #             self.s.level, )
+    #     else:
+    #         self.header = self.canonical_aa.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
+    #             self.s.uniprot,
+    #             self.s.gene_symbol,
+    #             self.s.gid,
+    #             self.s.tid,
+    #             self.s.strand,
+    #             f'Chr{self.s.chromosome}',
+    #             self.s.biotype,
+    #             self.s.tsl,
+    #             self.s.level, )
 
         # return self.header
 
 # Peptide Seq object class
 class Peptide(object):
     def __init__(self,
-                 sequence: Sequences,
-                 canonical: Canonical_test):
+                 sequence: Sequences):
         # sequence.subset_gtf()
         # sequence.get_meta()
         # sequence.annotated_trancript_trim()
+        self.s = sequence
         self.sequence = sequence
-        canonical.make_header()
         self.seq = str(sequence.seq)
         self.strand = sequence.strand
         self.frame = sequence.frame
-        self.header = canonical.header
         self.gene_name = sequence.gene_name
+        self.level = sequence.level
 
     def annotated_translate(self):
         """
@@ -441,14 +449,14 @@ class Peptide(object):
         :return: peptide from annotation coordinates
         """
         code = constants.genetic_code
-        pep = ''
+        self.prot = ''
         for i in range(len(self.seq) - 2, 3):
             aa = code[self.sequence.a_seq[i:i + 3]]
             if aa == 'X':
-                return pep
+                return self.prot
             else:
-                pep += aa
-        return pep
+                self.prot += aa
+        return self.prot
 
     @staticmethod
     def start_find_translate(nt, phase):
@@ -485,13 +493,45 @@ class Peptide(object):
             self.prot = d[max(d)]
         return self.prot
 
-    # TODO: write method to discern which translate method to use based upon value of seq from sequences class.
-    # TODO: also include a report to compare methods of translation?
-    def which_translate(self):
-        print("not Complete")
+    def get_canonical_aa_uniprot_local(self,
+                                       ) -> SeqRecord:
+        self.canonical_aa = ''
+        old = self.level
+        with open('resources/DB/reviewed_canonical.fasta') as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                if record.seq == self.prot:
+                    self.level = 'Canonical'
+                    self.canonical_aa = record.id
+        print(old,' ',self.level)
+        print(self.canonical_aa)
+
+    def make_header(self):
+        if self.level == 'Canonical':
+            self.header = self.canonical_aa + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
+                self.s.uniprot,
+                self.s.gene_symbol,
+                self.s.gid,
+                self.s.tid,
+                self.s.strand,
+                f'Chr{self.s.chromosome}',
+                self.s.biotype,
+                self.s.tsl,
+                self.s.level, )
+        else:
+            self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
+                f'LRCAST{self.s.level}',
+                self.s.uniprot,
+                self.s.gene_symbol,
+                self.s.gid,
+                self.s.tid,
+                self.s.strand,
+                f'Chr{self.s.chromosome}',
+                self.s.biotype,
+                self.s.tsl,
+                self.s.level, )
+
 
     # returns longest translated aa to a BioSeq Record object
     def str_to_seqrec(self, prot_seq):
-        print(self.gene_name)
         self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.gene_name)
         return self.rec
