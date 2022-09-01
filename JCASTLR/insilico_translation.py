@@ -496,17 +496,17 @@ class Peptide(object):
             self.prot = d[max(d)]
         return self.prot
 
-    def get_canonical_aa_uniprot_local(self,
-                                       ) -> SeqRecord:
-        self.canonical_aa = ''
-        old = self.level
-        with open('resources/DB/reviewed_canonical.fasta') as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                if record.seq == self.prot:
-                    self.level = 'Canonical'
-                    self.canonical_aa = record.id
-        print(old,' ',self.level)
-        print(self.canonical_aa)
+    # def get_canonical_aa_uniprot_local(self,
+    #                                    ) -> SeqRecord:
+    #     self.canonical_aa = ''
+    #     old = self.level
+    #     with open('resources/DB/reviewed_canonical.fasta') as f:
+    #         for record in SeqIO.parse(f, 'fasta'):
+    #             if record.seq == self.prot:
+    #                 self.level = 'Canonical'
+    #                 self.canonical_aa = record.id
+    #     print(old,' ',self.level)
+    #     print(self.canonical_aa)
 
     def make_header(self):
         self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
