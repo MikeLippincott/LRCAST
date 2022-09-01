@@ -24,8 +24,6 @@ Run this module with input files from the output of the FLAIR pipeline
 script will output theorectical translated peptides from JCASTLR RNASeq data
 """
 
-
-
 # Imports Bed File as object
 class Bed:
     def __init__(self, bed_loc):
