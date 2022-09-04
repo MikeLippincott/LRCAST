@@ -9,5 +9,3 @@ sample8	WT	batch1	resources/reads/ERR2856517.fastq
 sample9	WT	batch1	resources/reads/ERR2856518.fastq
 sample10	WT	batch1	resources/reads/ERR2856519.fastq
 sample11	WT	batch1	resources/reads/ERR2856520.fastq
-sample12	P633L	batch1	resources/reads/ERR4578910.fastq
-sample13	P633L	batch1	resources/reads/ERR4578911.fastq
