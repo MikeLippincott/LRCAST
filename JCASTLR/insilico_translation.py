@@ -469,7 +469,10 @@ class Peptide(object):
         code = constants.genetic_code
         pep = ''
         for i in range(phase, len(nt) - 2, 3):
-            aa = code[nt[i:i + 3]]
+            if 'N' in nt[i:i+3]:
+                aa = 'U'
+            else:
+                aa = code[nt[i:i + 3]]
             if len(pep) == 0:
                 if aa == 'M':
                     pep += aa
