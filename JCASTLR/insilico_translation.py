@@ -93,7 +93,7 @@ class Sequences(object):
         uniprot id
         :return: No return
         """
-        print(self.rid)
+        # print(self.rid)
         if 'ENST' in self.rid:
             enst = gget.info(self.tid)
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
@@ -269,7 +269,7 @@ class Sequences(object):
                 i += 1
             adjustedSS = (SS - (t_len))
         self.a_seq = (str(self.seq[adjustedSS:]))
-        print(self.a_seq)
+        # print(self.a_seq)
         # print(start, end)
         # print(e)
         # print(SS)
@@ -456,7 +456,7 @@ class Peptide(object):
                 return self.prot
             else:
                 self.prot += aa
-        print(self.prot)
+        # print(self.prot)
         return self.prot
 
     @staticmethod
@@ -545,7 +545,7 @@ class Post_hoc_reassignment():
                 if record.seq == self.p.prot:
                     self.level = 'Canonical'
                     self.canonical_aa = record.id
-        print(self.old, ' ', self.level)
+        # print(self.old, ' ', self.level)
         # print(self.canonical_aa)
 
     def make_header(self):
