@@ -108,6 +108,8 @@ class Sequences(object):
                 print("Check Meta Data method in Sequences Class")
 
             sleep(0.1)
+            if pd.isnull(enst['gene_name'].to_list()):
+                self.gene_symbol = '-'
             self.gene_symbol = enst['gene_name'].to_list()[0]
             # try:
             #     if pd.isnull(enst):
