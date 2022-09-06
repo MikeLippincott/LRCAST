@@ -45,13 +45,14 @@ class Gtf:
         # Ensembl gtf
         self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
 
-
 # Sequence object
 class Sequences(object):
     def __init__(self,
                  annotation_df: Gtf,
                  record):
+        # FLAIR GTF
         self.gtf = annotation_df.gtf
+        # Genomic GTF
         self.gtf_file = annotation_df.gtf_file
         self.rid = record.id
         self.tid = self.rid.split('_')[0]
@@ -95,7 +96,7 @@ class Sequences(object):
         """
         # print(self.rid)
         if 'ENST' in self.rid:
-            enst = gget.info(self.tid)
+            enst = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('feature == "transcript"')
             gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
             if len(gtf0) > 0:
                 self.level = "L1"
@@ -107,43 +108,43 @@ class Sequences(object):
                 print("Check Meta Data method in Sequences Class")
 
             sleep(0.1)
-
-            try:
-                if pd.isnull(enst):
-                    self.gene_name = '-'
-            except ValueError:
-                try:
-                    if pd.isnull(enst['protein_names'].to_list()):
-                        self.gene_name = "-"
-                    else:
-                        self.gene_name = enst['protein_names'].to_list()[0]
-                except ValueError:
-                    # gene_name = "-"
-                    self.gene_name = enst['protein_names'].to_list()[0][0]
-
-            if self.gene_name == '-':
-                enst = gget.info(self.gid)
-                try:
-                    if pd.isnull(enst):
-                        self.gene_name = '-'
-                except ValueError:
-                    try:
-                        if pd.isnull(enst['protein_names'].to_list()):
-                            self.gene_name = "-"
-                        else:
-                            self.gene_name = enst['protein_names'].to_list()[0]
-                    except ValueError:
-                        # gene_name = "-"
-                        self.gene_name = enst['protein_names'].to_list()[0][0]
+            self.gene_symbol = enst['gene_name'].to_list()[0]
+            # try:
+            #     if pd.isnull(enst):
+            #         self.gene_name = '-'
+            # except ValueError:
+            #     try:
+            #         if pd.isnull(enst['protein_names'].to_list()):
+            #             self.gene_name = "-"
+            #         else:
+            #             self.gene_name = enst['protein_names'].to_list()[0]
+            #     except ValueError:
+            #         # gene_name = "-"
+            #         self.gene_name = enst['protein_names'].to_list()[0][0]
+            #
+            # if self.gene_name == '-':
+            #     enst = gget.info(self.gid)
+            #     try:
+            #         if pd.isnull(enst):
+            #             self.gene_name = '-'
+            #     except ValueError:
+            #         try:
+            #             if pd.isnull(enst['protein_names'].to_list()):
+            #                 self.gene_name = "-"
+            #             else:
+            #                 self.gene_name = enst['protein_names'].to_list()[0]
+            #         except ValueError:
+            #             # gene_name = "-"
+            #             self.gene_name = enst['protein_names'].to_list()[0][0]
 
             # print(self.gene_name)
-            self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
+            # self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0:
                 self.tsl = "-"
             else:
                 self.tsl = gtf0['transcript_support_level'].to_list()[0]
-            self.uniprot = enst['uniprot_id'].to_list()[0]
+            # self.uniprot = enst['uniprot_id'].to_list()[0]
             # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
 
         elif 'ENSG' in self.rid:
@@ -158,28 +159,28 @@ class Sequences(object):
                 print("Check Meta Data method in Sequences Class")
 
             # print(self.gid)
-            ensg = gget.info(self.gid)
+            ensg = self.gtf_file.query(f'gene_id == "{self.gid}"').query('feature == "gene"')
             sleep(0.1)
             # self.gene_name = ensg['protein_names'].to_list()
             # print(self.gene_name[0])
             # print(ensg['protein_names'])
-            try:
-                if pd.isnull(ensg):
-                    self.gene_name = '-'
-            except ValueError:
-                try:
-                    if pd.isnull(ensg['protein_names'].to_list()):
-                        self.gene_name = "-"
-                    else:
-                        self.gene_name = ensg['protein_names'].to_list()[0]
-                except ValueError:
-                    # gene_name = "-"
-                    self.gene_name = ensg['protein_names'].to_list()[0][0]
+            # try:
+            #     if pd.isnull(ensg):
+            #         self.gene_name = '-'
+            # except ValueError:
+            #     try:
+            #         if pd.isnull(ensg['protein_names'].to_list()):
+            #             self.gene_name = "-"
+            #         else:
+            #             self.gene_name = ensg['protein_names'].to_list()[0]
+            #     except ValueError:
+            #         # gene_name = "-"
+            #         self.gene_name = ensg['protein_names'].to_list()[0][0]
 
             # print(self.gene_name)
-            self.gene_symbol = ensg['ensembl_gene_name'].to_list()[0]
+            self.gene_symbol = ensg['gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
-            self.uniprot = ensg['uniprot_id'].to_list()[0]
+            # self.uniprot = ensg['uniprot_id'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0 :
                 self.tsl = "-"
             else:
@@ -189,17 +190,17 @@ class Sequences(object):
         elif not "ENSG" in self.rid:
             self.level = "L5"
             self.biotype = "L5"
-            self.gene_name = "L5"
+            # self.gene_name = "L5"
             self.gene_symbol = "L5"
             self.chromosome = self.gtf0['seqname'].to_list()[0]
-            self.uniprot = "L5"
+            # self.uniprot = "L5"
             self.tsl = "L5"
 
         else:
             print('LRCAST: RNA Fasta Header Read Error!')
 
-        if pd.isnull(self.gene_name):
-            self.gene_name = '-'
+        # if pd.isnull(self.gene_name):
+        #     self.gene_name = '-'
 
     def annotated_trancript_trim(self):
         """
@@ -428,6 +429,7 @@ class Sequences(object):
         # return self.header
 
 # Peptide Seq object class
+
 class Peptide(object):
     def __init__(self,
                  sequence: Sequences):
@@ -439,7 +441,7 @@ class Peptide(object):
         self.seq = str(sequence.seq)
         self.strand = sequence.strand
         self.frame = sequence.frame
-        self.gene_name = sequence.gene_name
+        # self.gene_name = sequence.gene_name
         self.level = sequence.level
         self.a_seq = ''
 
@@ -451,7 +453,10 @@ class Peptide(object):
         code = constants.genetic_code
         self.prot = ''
         for i in range(0,len(self.sequence.a_seq) - 2, 3):
-            aa = code[self.sequence.a_seq[i:i + 3]]
+            if 'N' in self.sequence.a_seq[i:i+3]:
+                aa = 'U'
+            else:
+                aa = code[self.sequence.a_seq[i:i + 3]]
             if aa == 'X':
                 return self.prot
             else:
@@ -510,22 +515,21 @@ class Peptide(object):
     #     print(self.canonical_aa)
 
     def make_header(self):
-        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|".format(
+        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
             f'LRCAST{self.s.level}',
-            self.s.uniprot,
+            self.s.level,
             self.s.gene_symbol,
             self.s.gid,
             self.s.tid,
             self.s.strand,
             f'Chr{self.s.chromosome}',
             self.s.biotype,
-            self.s.tsl,
-            self.s.level, )
+            self.s.tsl,)
 
 
     # returns longest translated aa to a BioSeq Record object
     def str_to_seqrec(self, prot_seq):
-        self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.gene_name)
+        self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.s.gene_symbol)
         return self.rec
 
 class Post_hoc_reassignment():
@@ -535,30 +539,42 @@ class Post_hoc_reassignment():
         self.s = sequence
         self.p = peptide
         self.level = self.s.level
+        self.header = peptide.header
+        self.id = '-'
 
     def get_canonical_aa_uniprot_local(self,
+                                       DB,
                                        ) -> SeqRecord:
         self.canonical_aa = ''
         self.old = self.level
-        with open('resources/DB/reviewed_canonical.fasta') as f:
+        with open(DB) as f:
             for record in SeqIO.parse(f, 'fasta'):
                 if record.seq == self.p.prot:
                     self.level = 'Canonical'
-                    self.canonical_aa = record.id
+                    self.id = record.id
+
+    def get_aa_uniprot_local(self,
+                             DB,
+                             ) -> SeqRecord:
+        self.canonical_aa = ''
+        with open('resources/DB/reviewed_canonical.fasta') as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                if record.seq == self.p.prot:
+                    self.id = record.id
         # print(self.old, ' ', self.level)
         # print(self.canonical_aa)
 
     def make_header(self):
-        if self.level == 'Canonical':
-            self.header = self.canonical_aa + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
-                self.s.uniprot,
+        if self.id != '-':
+            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+                self.s.level,
                 self.s.gene_symbol,
                 self.s.gid,
                 self.s.tid,
                 self.s.strand,
                 f'Chr{self.s.chromosome}',
                 self.s.biotype,
-                self.s.tsl,
-                self.s.level, )
+                self.s.tsl, )
         else:
-            self.header = self.p.header
+            self.header = self.header
+

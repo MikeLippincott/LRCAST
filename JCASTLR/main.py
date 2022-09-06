@@ -127,12 +127,11 @@ def main():
             else:
                 print("Orphan Read")
             ph = ist.Post_hoc_reassignment(s,p)
-            ph.get_canonical_aa_uniprot_local()
+            ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
             ph.make_header()
             # post hoc change of level
             if ph.level == 'Canonical':
                 if ph.old == 'L1':
-
                     val = L1[-1]
                     # print("here   ",val)
                     Canonical.append(val)
@@ -155,6 +154,9 @@ def main():
                     L5 = L5[:-1]
                 else:
                     print("error post hoc")
+            elif ph.level != 'Canonical':
+                ph.get_aa_uniprot_local('resources/DB/reviewed_included_isoforms.fasta')
+                ph.make_header()
 
     for i in Canonical:
         lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
