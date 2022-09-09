@@ -87,3 +87,4 @@ def progress_bar(current,
     padding = int(bar_length - len(arrow)) * ' '
     ending = '\n' if current == total else '\r'
     print(f'Progress: [{arrow}{padding}] {int(fraction*100)}%', end=ending)
+

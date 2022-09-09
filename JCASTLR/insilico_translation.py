@@ -525,8 +525,7 @@ class Peptide(object):
     #     print(self.canonical_aa)
 
     def make_header(self):
-        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
-            f'LRCAST{self.s.level}',
+        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
             self.s.level,
             self.s.gene_symbol,
             self.s.gid,
@@ -542,6 +541,8 @@ class Peptide(object):
         self.rec = SeqRecord(Seq(prot_seq),f'{self.header}',description=self.s.gene_symbol)
         return self.rec
 
+
+
 class Post_hoc_reassignment():
     def __init__(self,
                  sequence:Sequences,
@@ -551,6 +552,7 @@ class Post_hoc_reassignment():
         self.level = self.s.level
         self.header = peptide.header
         self.id = '-'
+
 
     def get_canonical_aa_uniprot_local(self,
                                        DB,
@@ -567,7 +569,7 @@ class Post_hoc_reassignment():
                              DB,
                              ) -> SeqRecord:
         self.canonical_aa = ''
-        with open('resources/DB/reviewed_canonical.fasta') as f:
+        with open(DB) as f:
             for record in SeqIO.parse(f, 'fasta'):
                 if record.seq == self.p.prot:
                     self.id = record.id
@@ -587,4 +589,100 @@ class Post_hoc_reassignment():
                 self.s.tsl, )
         else:
             self.header = self.header
+
+    def str_to_seqrec(self):
+        self.rec = SeqRecord(Seq(self.p.prot),f'{self.header}',description=self.s.gene_symbol)
+        return self.rec
+
+
+class Post_hoc_reclassification():
+    def __init__(self,
+                 record):
+        self.prot = record.seq
+        self.header = record.id.split('|')
+        self.level = self.header[0]
+        self.gene_symbol = self.header[1]
+        self.gid = self.header[2]
+        self.tid = self.header[3]
+        self.strand = self.header[4]
+        self.chromosome = self.header[5]
+        self.biotype = self.header[6]
+        self.tsl = self.header[7]
+        self.id = '-'
+        print("Post-Hoc reclassification")
+
+    def get_canonical_aa_uniprot_local(self,
+                                       DB,
+                                       ) -> SeqRecord:
+        self.canonical_aa = ''
+        self.old = self.level
+        with open(DB) as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                if record.seq == self.prot:
+                    self.level = 'Canonical'
+                    self.id = record.id
+
+    def get_aa_uniprot_local(self,
+                             DB,
+                             ) -> SeqRecord:
+        self.canonical_aa = ''
+        with open(DB) as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                if record.seq == self.prot:
+                    self.id = record.id
+
+    def make_header(self):
+        if self.id != '-':
+            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+                self.level,
+                self.gene_symbol,
+                self.gid,
+                self.tid,
+                self.strand,
+                self.chromosome,
+                self.biotype,
+                self.tsl, )
+        else:
+            self.header = self.header
+
+    def str_to_seqrec(self):
+        self.rec = SeqRecord(self.prot,f'{self.header}',description=self.gene_symbol)
+        return self.rec
+
+    def reassignment(self):
+        C = []
+        L1 = []
+        L2 = []
+        L3 = []
+        L4 = []
+        L5 = []
+        if self.level == 'Canonical':
+            C.append(self.rec)
+        elif self.level == 'L1':
+            L1.append(self.rec)
+        elif self.level == 'L2':
+            L2.append(self.rec)
+        elif self.level == 'L3':
+            L3.append(self.rec)
+        elif self.level == 'L4':
+            L4.append(self.rec)
+        elif self.level == 'L5':
+            L5.append(self.rec)
+        else:
+            print("error post hoc")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

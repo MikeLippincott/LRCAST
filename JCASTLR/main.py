@@ -13,6 +13,8 @@ from pybiomart import Server # for retrieval of Uniprot IDs
 import constants
 import os
 from time import sleep
+from joblib import Parallel, delayed
+import multiprocessing
 
 # Main function
 def main():
@@ -125,40 +127,121 @@ def main():
                 p.make_header()
                 seq = p.str_to_seqrec(prot_seq)
                 L5.append(seq)
-
             else:
                 print("Orphan Read")
+
             ph = ist.Post_hoc_reassignment(s,p)
             ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
             ph.make_header()
+
             # post hoc change of level
             if ph.level == 'Canonical':
                 if ph.old == 'L1':
-                    val = L1[-1]
+                    # val = L1[-1]
+                    seq = ph.str_to_seqrec()
                     # print("here   ",val)
-                    Canonical.append(val)
+                    Canonical.append(seq)
                     L1 = L1[:-1]
                 elif ph.old == 'L2':
-                    val = L2[-1]
-                    Canonical.append(val)
+                    # val = L2[-1]
+                    seq = ph.str_to_seqrec()
+                    Canonical.append(seq)
                     L2 = L2[:-1]
                 elif ph.old == 'L3':
-                    val = L3[-1]
-                    Canonical.append(val)
+                    # val = L3[-1]
+                    seq = ph.str_to_seqrec()
+                    Canonical.append(seq)
                     L3 = L3[:-1]
                 elif ph.old == 'L4':
-                    val = L4[-1]
-                    Canonical.append(val)
+                    # val = L4[-1]
+                    seq = ph.str_to_seqrec()
+                    Canonical.append(seq)
                     L4 = L4[:-1]
                 elif ph.old == 'L5':
-                    val = L5[-1]
-                    Canonical.append(val)
+                    # val = L5[-1]
+                    seq = ph.str_to_seqrec()
+                    Canonical.append(seq)
                     L5 = L5[:-1]
                 else:
                     print("error post hoc")
             elif ph.level != 'Canonical':
                 ph.get_aa_uniprot_local('resources/DB/reviewed_included_isoforms.fasta')
                 ph.make_header()
+                # seq = ph.str_to_seqrec()
+    #
+    # Canonical_revised = []
+    # L1_revised = []
+    # L2_revised = []
+    # L3_revised = []
+    # L4_revised = []
+    # L5_revised = []
+    #
+    # j = 0
+    # for i in L1:
+    #     lrf.progress_bar(j,len(L1))
+    #     ph = ist.Post_hoc_reclassification(i)
+    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    #     # ph.get_aa_uniprot_local()
+    #     ph.make_header()
+    #
+    #
+    #
+    # for i in L2:
+    #     lrf.progress_bar(j, len(L2))
+    #     ph = ist.Post_hoc_reclassification(i)
+    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    #     # ph.get_aa_uniprot_local()
+    #     ph.make_header()
+    #     seq = ph.str_to_seqrec()
+    #     L2_revised.append(seq)
+    #
+    # for i in L3:
+    #     lrf.progress_bar(j, len(L1))
+    #     ph = ist.Post_hoc_reclassification(i)
+    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    #     # ph.get_aa_uniprot_local()
+    #     ph.make_header()
+    #     seq = ph.str_to_seqrec()
+    #     L3_revised.append(seq)
+    #
+    # for i in L4:
+    #     lrf.progress_bar(j, len(L1))
+    #     ph = ist.Post_hoc_reclassification(i)
+    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    #     # ph.get_aa_uniprot_local()
+    #     ph.make_header()
+    #     seq = ph.str_to_seqrec()
+    #     L4_revised.append(seq)
+    #
+    # for i in L5:
+    #     lrf.progress_bar(j, len(L1))
+    #     ph = ist.Post_hoc_reclassification(i)
+    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    #     # ph.get_aa_uniprot_local()
+    #     ph.make_header()
+    #     seq = ph.str_to_seqrec()
+    #     L5_revised.append(seq)
+
+    # for i in Canonical_revised:
+    #     lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
+    # print(f'{len(Canonical_revised)} Canonical Isoforms')
+    # for i in L1_revised:
+    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
+    # print(f'{len(L1_revised)} Level 1 Isoforms')
+    # for i in L2_revised:
+    #     lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
+    # print(f'{len(L2_revised)} Level 2 Isoforms')
+    # for i in L3_revised:
+    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
+    # print(f'{len(L3_revised)} Level 3 Isoforms')
+    # for i in L4_revised:
+    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
+    # print(f'{len(L4_revised)} Level 4 Isoforms')
+    # for i in L5_revised:
+    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
+    # print(f'{len(L5_revised)} Level 5 Isoforms')
+
+
 
     for i in Canonical:
         lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
@@ -180,7 +263,6 @@ def main():
     print(f'{len(L5)} Level 5 Isoforms')
 
     print(f'{time.perf_counter() - start} seconds')
-
 
 
 
