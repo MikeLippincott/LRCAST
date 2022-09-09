@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from gtfparse import read_gtf
 from Bio import SeqIO
+import time
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from pybiomart import Server # for retrieval of Uniprot IDs
@@ -15,6 +16,7 @@ from time import sleep
 
 # Main function
 def main():
+    start = time.perf_counter()
     # Parse Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
@@ -176,6 +178,8 @@ def main():
     for i in L5:
         lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
     print(f'{len(L5)} Level 5 Isoforms')
+
+    print(f'{time.perf_counter() - start} seconds')
 
 
 

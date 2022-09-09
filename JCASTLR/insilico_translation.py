@@ -110,7 +110,10 @@ class Sequences(object):
             sleep(0.1)
             if pd.isnull(enst['gene_name'].to_list()):
                 self.gene_symbol = '-'
-            self.gene_symbol = enst['gene_name'].to_list()[0]
+            elif enst['gene_name'].to_list() == []:
+                self.gene_symbol = '-'
+            else:
+                self.gene_symbol = enst['gene_name'].to_list()[0]
             # try:
             #     if pd.isnull(enst):
             #         self.gene_name = '-'
@@ -180,7 +183,12 @@ class Sequences(object):
             #         self.gene_name = ensg['protein_names'].to_list()[0][0]
 
             # print(self.gene_name)
-            self.gene_symbol = ensg['gene_name'].to_list()[0]
+            if pd.isnull(ensg['gene_name'].to_list()):
+                self.gene_symbol = '-'
+            elif ensg['gene_name'].to_list() == []:
+                self.gene_symbol = '-'
+            else:
+                self.gene_symbol = ensg['gene_name'].to_list()[0]
             self.chromosome = self.gtf0['seqname'].to_list()[0]
             # self.uniprot = ensg['uniprot_id'].to_list()[0]
             if len(gtf0['transcript_support_level']) == 0 :
