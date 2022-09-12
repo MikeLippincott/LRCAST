@@ -218,6 +218,9 @@ class Sequences(object):
         """
         gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
         TSS = gtf0.query('feature == "start_codon" ')
+        if TSS['start'].to_list() == []:
+            gtf0 = self.gtf_file.query(f'gene_id == "{self.gid}"').query('transcript_biotype == "protein_coding" ')
+            TSS = gtf0.query('feature == "start_codon" ')
         transcript_df = gtf0.query('feature == "transcript" ')
         exons = gtf0.query('feature == "exon" ')
         # exons = exons.sort_values(by="exon_number")
@@ -229,13 +232,13 @@ class Sequences(object):
 
         strand = jcast['strand'].to_list()[0]
         phase = int(jcast['frame'].to_list()[0])
-        if len(TSS) > 0:
-            y1 = TSS['start'].to_list()[0]
-            y2 = TSS['end'].to_list()[0]
-        elif len(TSS) == 0:
+        if len(TSS) == 0:
             print("No Annotated Start Codon")
             self.a_seq = ''
-            return None
+            return self.a_seq
+        elif len(TSS) > 0:
+            y1 = TSS['start'].to_list()[0]
+            y2 = TSS['end'].to_list()[0]
         if strand == '+':
             SS = y1 - x1
         elif strand == '-':
@@ -280,12 +283,6 @@ class Sequences(object):
                 i += 1
             adjustedSS = (SS - (t_len))
         self.a_seq = (str(self.seq[adjustedSS:]))
-        # print(self.a_seq)
-        # print(start, end)
-        # print(e)
-        # print(SS)
-        # print(t_len)
-        # print(adjustedSS)
         return self.a_seq
 
 # uniprot_max_retries = 10 # Defined for number of retries for uinprot address in Canonical_tests
@@ -462,16 +459,20 @@ class Peptide(object):
         """
         code = constants.genetic_code
         self.prot = ''
-        for i in range(0,len(self.sequence.a_seq) - 2, 3):
-            if 'N' in self.sequence.a_seq[i:i+3]:
-                aa = 'U'
-            else:
-                aa = code[self.sequence.a_seq[i:i + 3]]
-            if aa == 'X':
-                return self.prot
-            else:
-                self.prot += aa
-        # print(self.prot)
+        # print(self.s.a_seq)
+        if self.s.a_seq == '':
+            self.prot = ''
+        else:
+            for i in range(0,len(self.s.a_seq) - 2, 3):
+                if 'N' in self.sequence.a_seq[i:i+3]:
+                    aa = 'U'
+                else:
+                    aa = code[self.s.a_seq[i:i + 3]]
+                if aa == 'X':
+                    return self.prot
+                else:
+                    self.prot += aa
+            # print(self.prot)
         return self.prot
 
     @staticmethod
@@ -550,7 +551,7 @@ class Post_hoc_reassignment():
         self.s = sequence
         self.p = peptide
         self.level = self.s.level
-        self.header = peptide.header
+        self.header = self.p.header
         self.id = '-'
 
 
@@ -564,6 +565,7 @@ class Post_hoc_reassignment():
                 if record.seq == self.p.prot:
                     self.level = 'Canonical'
                     self.id = record.id
+        # print(self.old, ' ', self.level)
 
     def get_aa_uniprot_local(self,
                              DB,
@@ -575,6 +577,7 @@ class Post_hoc_reassignment():
                     self.id = record.id
         # print(self.old, ' ', self.level)
         # print(self.canonical_aa)
+
 
     def make_header(self):
         if self.id != '-':
@@ -591,7 +594,8 @@ class Post_hoc_reassignment():
             self.header = self.header
 
     def str_to_seqrec(self):
-        self.rec = SeqRecord(Seq(self.p.prot),f'{self.header}',description=self.s.gene_symbol)
+        self.rec = SeqRecord(Seq(self.p.prot),self.header,description=self.s.gene_symbol)
+        # print(self.rec)
         return self.rec
 
 

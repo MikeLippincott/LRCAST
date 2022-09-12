@@ -67,10 +67,12 @@ def prot_to_fasta(seqrecord,
 
     for read_record in existing_records:
         if read_record.seq == seqrecord.seq:
+            print('duplicate')
             return True
 
     with open(outfile, 'a') as output_handle:
         SeqIO.write(seqrecord, output_handle, 'fasta')
+
 
 # progress bar for run time estimation
 def progress_bar(current,

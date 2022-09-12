@@ -17,6 +17,7 @@ from time import sleep
 from joblib import Parallel, delayed
 import multiprocessing
 import threading
+import concurrent.futures
 
 # Main function
 def main():
@@ -52,18 +53,30 @@ def main():
             number_of_records += 1
     print(f'{number_of_records} transcripts to process.')
     # loop through each record to get info and translate
-    with open(fasta) as f:
-        # num_cores = multiprocessing.cpu_count()
-        # print(num_cores)
-        # results = Parallel(n_jobs=num_cores)(delayed(paralell_me)(record,g,out_location, prefix) for record in SeqIO.parse(f, 'fasta'))
-        # print(results)
-        number_of_records = 0
-        threads = list()
-        for record in SeqIO.parse(f, 'fasta'):
-            number_of_records += 1
-            x = threading.Thread(target=paralell_me, args=(record,g,out_location,prefix,))
-            threads.append(x)
-            x.start()
+
+
+    # with open(fasta) as f:
+    #     # num_cores = multiprocessing.cpu_count()
+    #     # print(num_cores)
+    #     # results = Parallel(n_jobs=num_cores)(delayed(paralell_me)(record,g,out_location, prefix) for record in SeqIO.parse(f, 'fasta'))
+    #     # print(results)
+    #     number_of_records = 0
+    #     threads = list()
+    #
+    #     for record in SeqIO.parse(f, 'fasta'):
+    #         number_of_records += 1
+    #         x = threading.Thread(target=paralell_me, args=(record,g,out_location,prefix,))
+    #         threads.append(x)
+    #         x.start()
+
+    num_cores = ((multiprocessing.cpu_count() - 2)*2)
+    print(num_cores)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
+        with open(fasta) as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                executor.submit(paralell_me(record, g, out_location, prefix), record)
+
+    sleep(5)
     prs.post_run_counts(out_location,prefix)
     print(f'{time.perf_counter() - start} seconds')
 
