@@ -48,10 +48,10 @@ def main():
     # L4 = []
     # L5 = []
     with open(fasta) as f:
-        number_of_records = 0
+        n = 0
         for record in SeqIO.parse(f, 'fasta'):
-            number_of_records += 1
-    print(f'{number_of_records} transcripts to process.')
+            n += 1
+    print(f'{n} transcripts to process.')
     # loop through each record to get info and translate
 
 
@@ -73,7 +73,10 @@ def main():
     print(num_cores)
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
         with open(fasta) as f:
+            n1 =0
             for record in SeqIO.parse(f, 'fasta'):
+                n1 += 1
+                lrf.progress_bar(n1, n, 50)
                 executor.submit(paralell_me(record, g, out_location, prefix), record)
 
     sleep(5)
