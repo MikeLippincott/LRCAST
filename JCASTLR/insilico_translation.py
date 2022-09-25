@@ -18,32 +18,51 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from io import StringIO
 from time import sleep
+import model
 
 """
 Run this module with input files from the output of the FLAIR pipeline
 script will output theorectical translated peptides from JCASTLR RNASeq data
 """
 
-# Imports Bed File as object
-class Bed:
-    def __init__(self, bed_loc):
-        self.bed = pd.read_csv(bed_loc, sep='\t', comment='t', header=None)
-        header = ['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'itemRgb',
-                  'blockCount', 'blockSizes', 'blockStarts']
-        self.bed.columns = header[:len(self.bed.columns)]
-        # self.name = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['name'].tolist()
-        # self.score = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['score'].tolist()
-        # self.start = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromStart'].tolist()
-        # self.end = self.bed[self.bed['name'].str.contains('ENSG00000171163')]['chromEnd'].tolist()
-
 # Imports GTF file as object
 class Gtf:
-    def __init__(self, gtf_loc):
+    def __init__(self, gtf_loc, counts_matrix):
         print("LOADING GTF FILES INTO PANDAS DATAFRAMES.")
         # FLAIR output gtf
         self.gtf = read_gtf(gtf_loc)
         # Ensembl gtf
         self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
+        self.counts = pd.read_table(counts_matrix)
+
+    def read_cutoff(self, write_dir):
+        exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
+        lst = []
+        for i, j, k in zip(exp[0], exp[1], exp[2]):
+            col = f'{i}_{j}_{k}'
+            lst.append(col)
+        count = 0
+        for i in lst:
+            count += self.counts[f'{i}']
+        self.counts['counts'] = count
+        df1 = self.counts[(self.counts.counts > 1)]
+        write_dir = os.getcwd()
+        ln_sjc, best_mix_model, self.min_count = model.general_mixture_model(sum_sjc_array=df1['counts'].astype(int))
+        model.plot_general_mixture_model(
+            ln_sjc,
+            best_mix_model,
+            self.min_count,
+            write_dir=write_dir,
+            filename='model',
+        )
+        df3 = self.counts[(self.counts.counts > self.min_count)]
+        self.gtf['ids'] = self.gtf["transcript_id"] + "_" + self.gtf["gene_id"]
+        self.gtf = pd.merge(self.gtf, df3, on=['ids'], how='right')
+        gene_ids = np.unique(self.gtf['gene_id'])
+        bools = self.gtf_file.gene_id.isin(gene_ids)
+        self.gtf_file = self.gtf_file[bools]
+
+
 
 # Sequence object
 class Sequences(object):
@@ -54,6 +73,7 @@ class Sequences(object):
         self.gtf = annotation_df.gtf
         # Genomic GTF
         self.gtf_file = annotation_df.gtf_file
+        self.counts_df = annotation_df.counts
         self.rid = record.id
         self.tid = self.rid.split('_')[0]
         self.gid = self.rid.split('_')[1]
@@ -67,16 +87,35 @@ class Sequences(object):
         """
         self.gtf0 = self.gtf.query(f'gene_id == "{self.gid}"').query('feature == "transcript"')
         self.strand = self.gtf0['strand'].unique()
+        print(self.gtf0['frame'])
         if len(self.strand) == 1:
             self.strand = self.strand[0]
         else:
             self.strand = 0
-        self.frame = self.gtf0['frame'].unique()[0]
+        self.frame = self.gtf0['frame'].unique()
         if len(self.frame) == 1:
             self.frame = int(self.frame[0])
         else:
             self.frame == None
         # return self.id, self.strand, self.frame, self.transcript
+
+    def get_counts(self):
+        print(self.tid,self.gid)
+        exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
+        df1 = self.counts_df.loc[self.counts_df['ids'] == f'{self.tid}_{self.gid}']
+        lst = []
+        for i, j, k in zip(exp[0], exp[1], exp[2]):
+            col = f'{i}_{j}_{k}'
+            lst.append(col)
+        t = 0
+        for i in lst:
+            if len(df1[f'{i}']) == 0:
+                self.counts = 0
+            else:
+                t += int(df1[f'{i}'])
+        self.counts = t
+        print(self.counts)
+
 
     # retrieve transcript or gene meta data
     def get_meta(self):
@@ -86,7 +125,7 @@ class Sequences(object):
         is available (ensembl transcript id has priority over ensembl gene id)
         Metadata to retieve:
         level
-        biotyep
+        biotype
         gene symbol
         gene name
         chromosome
@@ -102,8 +141,21 @@ class Sequences(object):
                 self.level = "L1"
                 self.biotype = "protein_coding"
             elif len(gtf0) == 0:
-                self.biotype = np.unique(self.gtf_file.query(f'transcript_id == "{self.tid}"')['transcript_biotype'])
                 self.level = "L3"
+                biotype = ''
+                tmp = np.unique(self.gtf_file.query(f'transcript_id == "{self.tid}"')['transcript_biotype'])
+                if len(tmp) > 0:
+                    if len(biotype) > 0:
+                        biotype += '__'
+                    else:
+                        for i in range(len(tmp)):
+                            if tmp[i] == '':
+                                biotype = biotype
+                            else:
+                                biotype += tmp[i]
+                else:
+                    biotype = '-'
+                self.biotype = biotype
             else:
                 print("Check Meta Data method in Sequences Class")
 
@@ -114,37 +166,8 @@ class Sequences(object):
                 self.gene_symbol = '-'
             else:
                 self.gene_symbol = enst['gene_name'].to_list()[0]
-            # try:
-            #     if pd.isnull(enst):
-            #         self.gene_name = '-'
-            # except ValueError:
-            #     try:
-            #         if pd.isnull(enst['protein_names'].to_list()):
-            #             self.gene_name = "-"
-            #         else:
-            #             self.gene_name = enst['protein_names'].to_list()[0]
-            #     except ValueError:
-            #         # gene_name = "-"
-            #         self.gene_name = enst['protein_names'].to_list()[0][0]
-            #
-            # if self.gene_name == '-':
-            #     enst = gget.info(self.gid)
-            #     try:
-            #         if pd.isnull(enst):
-            #             self.gene_name = '-'
-            #     except ValueError:
-            #         try:
-            #             if pd.isnull(enst['protein_names'].to_list()):
-            #                 self.gene_name = "-"
-            #             else:
-            #                 self.gene_name = enst['protein_names'].to_list()[0]
-            #         except ValueError:
-            #             # gene_name = "-"
-            #             self.gene_name = enst['protein_names'].to_list()[0][0]
 
-            # print(self.gene_name)
-            # self.gene_symbol = enst['ensembl_gene_name'].to_list()[0]
-            self.chromosome = self.gtf0['seqname'].to_list()[0]
+            self.chromosome = self.gtf0['seqname'].to_list()
             if len(gtf0['transcript_support_level']) == 0:
                 self.tsl = "-"
             else:
@@ -158,7 +181,22 @@ class Sequences(object):
                 self.level = "L2"
                 self.biotype = "protein_coding"
             elif len(gtf0) == 0:
-                self.biotype = np.unique(self.gtf_file.query(f'gene_id == "{self.gid}"')['transcript_biotype'])
+                biotype = ''
+                tmp = np.unique(self.gtf_file.query(f'gene_id == "{self.gid}"')['transcript_biotype'])
+                if len(tmp) > 0:
+                    if len(biotype) > 0:
+                        biotype += '__'
+                    else:
+                        for i in range(len(tmp)):
+                            if tmp[i] == '':
+                                biotype = biotype
+                            else:
+                                biotype += tmp[i]
+                else:
+                    biotype = '-'
+                self.biotype = biotype
+
+
                 self.level = "L4"
             else:
                 print("Check Meta Data method in Sequences Class")
@@ -526,7 +564,7 @@ class Peptide(object):
     #     print(self.canonical_aa)
 
     def make_header(self):
-        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+        self.header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
             self.s.level,
             self.s.gene_symbol,
             self.s.gid,
@@ -534,7 +572,8 @@ class Peptide(object):
             self.s.strand,
             f'Chr{self.s.chromosome}',
             self.s.biotype,
-            self.s.tsl,)
+            self.s.tsl,
+            self.s.counts,)
 
 
     # returns longest translated aa to a BioSeq Record object
@@ -581,7 +620,7 @@ class Post_hoc_reassignment():
 
     def make_header(self):
         if self.id != '-':
-            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
                 self.s.level,
                 self.s.gene_symbol,
                 self.s.gid,
@@ -589,7 +628,8 @@ class Post_hoc_reassignment():
                 self.s.strand,
                 f'Chr{self.s.chromosome}',
                 self.s.biotype,
-                self.s.tsl, )
+                f'tsl_{self.s.tsl}',
+                self.s.counts,)
         else:
             self.header = self.header
 
@@ -612,6 +652,7 @@ class Post_hoc_reclassification():
         self.chromosome = self.header[5]
         self.biotype = self.header[6]
         self.tsl = self.header[7]
+        self.counts = self.header[8]
         self.id = '-'
         print("Post-Hoc reclassification")
 
@@ -637,7 +678,7 @@ class Post_hoc_reclassification():
 
     def make_header(self):
         if self.id != '-':
-            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|".format(
+            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
                 self.level,
                 self.gene_symbol,
                 self.gid,
@@ -645,7 +686,8 @@ class Post_hoc_reclassification():
                 self.strand,
                 self.chromosome,
                 self.biotype,
-                self.tsl, )
+                self.tsl,
+                self.counts,)
         else:
             self.header = self.header
 

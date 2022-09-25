@@ -19,7 +19,7 @@ samples:
     - 'test0_short'
 
   exp:
-    'experiment_info'
+    'experiment_info(1)'
 
 genome:
   gtf:

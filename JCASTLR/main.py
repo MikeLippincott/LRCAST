@@ -25,19 +25,17 @@ def main():
     # Parse Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
-    parser.add_argument('-b', '--bed', help='path to bed file', required=True)
     parser.add_argument('-f', '--fasta', help='path to fasta file', required=True)
     parser.add_argument('-p', '--file_prefix', help='filename prefix (not path)', required=True)
     parser.add_argument('-o', '--outpath', help='Output path. Note JCASTLR autonames files', required=True)
     args = parser.parse_args()
     # set constants
     gtf = args.gtf
-    bed = args.bed
     fasta = args.fasta
     prefix = args.file_prefix
     out_location = args.outpath
-    g = ist.Gtf(gtf)
-    b = ist.Bed(bed)
+    g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
+    g.read_cutoff('results')
     duplicate_count = 0
     # define how many reads need to be looped through and level lists
     # with open(fasta) as f:
@@ -73,13 +71,12 @@ def main():
     print(num_cores)
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
         with open(fasta) as f:
-            n1 =0
+            n1 = 0
             for record in SeqIO.parse(f, 'fasta'):
                 n1 += 1
                 lrf.progress_bar(n1, n, 50)
                 executor.submit(paralell_me(record, g, out_location, prefix), record)
-
-    sleep(5)
+    sleep(7)
     prs.post_run_counts(out_location,prefix)
     print(f'{time.perf_counter() - start} seconds')
 
@@ -88,6 +85,9 @@ def paralell_me(record,g,out_location, prefix):
     # lrf.progress_bar(n1, n, 50)
     r = record
     s = ist.Sequences(g, r)
+    s.get_counts()
+    if s.counts < g.min_count:
+        return
     s.subset_gtf()
     s.get_meta()
     # a = ist.Canonical_test(s)
@@ -323,9 +323,6 @@ def paralell_me(record,g,out_location, prefix):
     # for i in L5:
     #     lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
     # print(f'{len(L5)} Level 5 Isoforms')
-
-
-
 
 
 

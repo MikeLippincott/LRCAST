@@ -1,6 +1,0 @@
-sample1	conditionA	batch1	resources/reads/test10_long.fastq
-sample2	conditionA	batch1	resources/reads/test11_long.fastq
-sample3	conditionA	batch1	resources/reads/test12_long.fastq
-sample4	conditionB	batch1	resources/reads/test14_long.fastq
-sample5	conditionB	batch1	resources/reads/test15_long.fastq
-sample6	conditionB	batch1	resources/reads/test16_long.fastq
