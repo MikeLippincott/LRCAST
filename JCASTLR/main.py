@@ -37,36 +37,13 @@ def main():
     g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
     g.read_cutoff('results')
     duplicate_count = 0
-    # define how many reads need to be looped through and level lists
-    # with open(fasta) as f:
-    # Canonical = []
-    # L1 = []
-    # L2 = []
-    # L3 = []
-    # L4 = []
-    # L5 = []
     with open(fasta) as f:
         n = 0
         for record in SeqIO.parse(f, 'fasta'):
             n += 1
     print(f'{n} transcripts to process.')
+
     # loop through each record to get info and translate
-
-
-    # with open(fasta) as f:
-    #     # num_cores = multiprocessing.cpu_count()
-    #     # print(num_cores)
-    #     # results = Parallel(n_jobs=num_cores)(delayed(paralell_me)(record,g,out_location, prefix) for record in SeqIO.parse(f, 'fasta'))
-    #     # print(results)
-    #     number_of_records = 0
-    #     threads = list()
-    #
-    #     for record in SeqIO.parse(f, 'fasta'):
-    #         number_of_records += 1
-    #         x = threading.Thread(target=paralell_me, args=(record,g,out_location,prefix,))
-    #         threads.append(x)
-    #         x.start()
-
     num_cores = ((multiprocessing.cpu_count() - 2)*2)
     print(num_cores)
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
@@ -86,8 +63,8 @@ def paralell_me(record,g,out_location, prefix):
     r = record
     s = ist.Sequences(g, r)
     s.get_counts()
-    if s.counts < g.min_count:
-        return
+    if s.counts <= g.min_count:
+        return 1
     s.subset_gtf()
     s.get_meta()
     # a = ist.Canonical_test(s)
@@ -228,102 +205,5 @@ def paralell_me(record,g,out_location, prefix):
             print("error post hoc")
     else:
         print("Error")
-
-
-    #
-    # Canonical_revised = []
-    # L1_revised = []
-    # L2_revised = []
-    # L3_revised = []
-    # L4_revised = []
-    # L5_revised = []
-    #
-    # j = 0
-    # for i in L1:
-    #     lrf.progress_bar(j,len(L1))
-    #     ph = ist.Post_hoc_reclassification(i)
-    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
-    #     # ph.get_aa_uniprot_local()
-    #     ph.make_header()
-    #
-    #
-    #
-    # for i in L2:
-    #     lrf.progress_bar(j, len(L2))
-    #     ph = ist.Post_hoc_reclassification(i)
-    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
-    #     # ph.get_aa_uniprot_local()
-    #     ph.make_header()
-    #     seq = ph.str_to_seqrec()
-    #     L2_revised.append(seq)
-    #
-    # for i in L3:
-    #     lrf.progress_bar(j, len(L1))
-    #     ph = ist.Post_hoc_reclassification(i)
-    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
-    #     # ph.get_aa_uniprot_local()
-    #     ph.make_header()
-    #     seq = ph.str_to_seqrec()
-    #     L3_revised.append(seq)
-    #
-    # for i in L4:
-    #     lrf.progress_bar(j, len(L1))
-    #     ph = ist.Post_hoc_reclassification(i)
-    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
-    #     # ph.get_aa_uniprot_local()
-    #     ph.make_header()
-    #     seq = ph.str_to_seqrec()
-    #     L4_revised.append(seq)
-    #
-    # for i in L5:
-    #     lrf.progress_bar(j, len(L1))
-    #     ph = ist.Post_hoc_reclassification(i)
-    #     ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
-    #     # ph.get_aa_uniprot_local()
-    #     ph.make_header()
-    #     seq = ph.str_to_seqrec()
-    #     L5_revised.append(seq)
-
-    # for i in Canonical_revised:
-    #     lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
-    # print(f'{len(Canonical_revised)} Canonical Isoforms')
-    # for i in L1_revised:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
-    # print(f'{len(L1_revised)} Level 1 Isoforms')
-    # for i in L2_revised:
-    #     lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
-    # print(f'{len(L2_revised)} Level 2 Isoforms')
-    # for i in L3_revised:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
-    # print(f'{len(L3_revised)} Level 3 Isoforms')
-    # for i in L4_revised:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
-    # print(f'{len(L4_revised)} Level 4 Isoforms')
-    # for i in L5_revised:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
-    # print(f'{len(L5_revised)} Level 5 Isoforms')
-
-
-
-    # for i in Canonical:
-    #     lrf.prot_to_fasta(i, out_location, prefix, "_Canonical")
-    # print(f'{len(Canonical)} Canonical Isoforms')
-    # for i in L1:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level1")
-    # print(f'{len(L1)} Level 1 Isoforms')
-    # for i in L2:
-    #     lrf.prot_to_fasta(i, out_location,prefix, "_Level2")
-    # print(f'{len(L2)} Level 2 Isoforms')
-    # for i in L3:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level3")
-    # print(f'{len(L3)} Level 3 Isoforms')
-    # for i in L4:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level4")
-    # print(f'{len(L4)} Level 4 Isoforms')
-    # for i in L5:
-    #     lrf.prot_to_fasta(i, out_location, prefix,"_Level5")
-    # print(f'{len(L5)} Level 5 Isoforms')
-
-
 
 
