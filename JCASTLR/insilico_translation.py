@@ -19,6 +19,7 @@ from urllib3.util.retry import Retry
 from io import StringIO
 from time import sleep
 import model
+import logging
 
 """
 Run this module with input files from the output of the FLAIR pipeline
@@ -87,7 +88,6 @@ class Sequences(object):
         """
         self.gtf0 = self.gtf.query(f'gene_id == "{self.gid}"').query('feature == "transcript"')
         self.strand = self.gtf0['strand'].unique()
-        print(self.gtf0['frame'])
         if len(self.strand) == 1:
             self.strand = self.strand[0]
         else:
@@ -100,7 +100,7 @@ class Sequences(object):
         # return self.id, self.strand, self.frame, self.transcript
 
     def get_counts(self):
-        print(self.tid,self.gid)
+        # print(self.tid,self.gid)
         exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
         df1 = self.counts_df.loc[self.counts_df['ids'] == f'{self.tid}_{self.gid}']
         lst = []
@@ -114,7 +114,7 @@ class Sequences(object):
             else:
                 t += int(df1[f'{i}'])
         self.counts = t
-        print(self.counts)
+        # print(self.counts)
 
 
     # retrieve transcript or gene meta data

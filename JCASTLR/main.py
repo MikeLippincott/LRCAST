@@ -43,19 +43,42 @@ def main():
             n += 1
     print(f'{n} transcripts to process.')
 
-    # loop through each record to get info and translate
-    num_cores = ((multiprocessing.cpu_count() - 2)*2)
-    print(num_cores)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
-        with open(fasta) as f:
-            n1 = 0
-            for record in SeqIO.parse(f, 'fasta'):
-                n1 += 1
-                lrf.progress_bar(n1, n, 50)
-                executor.submit(paralell_me(record, g, out_location, prefix), record)
+    with open(fasta) as f:
+        n1 = 0
+        for record in SeqIO.parse(f, 'fasta'):
+            n1 += 1
+            lrf.progress_bar(n1, n, 50)
+            paralell_me(record, g, out_location, prefix)
     sleep(7)
     prs.post_run_counts(out_location,prefix)
     print(f'{time.perf_counter() - start} seconds')
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#     # loop through each record to get info and translate
+#     num_cores = ((multiprocessing.cpu_count() - 2)*2)
+#     print(num_cores)
+#     with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
+#         with open(fasta) as f:
+#             n1 = 0
+#             for record in SeqIO.parse(f, 'fasta'):
+#                 n1 += 1
+#                 lrf.progress_bar(n1, n, 50)
+#                 executor.submit(paralell_me(record, g, out_location, prefix), record)
+#     sleep(7)
+#     prs.post_run_counts(out_location,prefix)
+#     print(f'{time.perf_counter() - start} seconds')
 
 def paralell_me(record,g,out_location, prefix):
     # n1 += 1
@@ -77,9 +100,14 @@ def paralell_me(record,g,out_location, prefix):
         # a.make_header()
         s.annotated_trancript_trim()
         p = ist.Peptide(s)
-        prot_seq = p.annotated_translate()
-        # p.get_canonical_aa_uniprot_local()
-        p.make_header()
+        p1 = p.annotated_translate()
+        p2 = p.multi_phase_translate()
+        if len(p1) > len(p2):
+            p.prot = p1
+        elif len(p1) < len(p2):
+            p.prot = p2
+        else:
+            p.prot = p1
         # seq = p.str_to_seqrec(prot_seq)
         # Canonical.append(seq)
     elif s.level == "L1":
@@ -88,7 +116,14 @@ def paralell_me(record,g,out_location, prefix):
         # a.make_header()
         s.annotated_trancript_trim()
         p = ist.Peptide(s)
-        prot_seq = p.annotated_translate()
+        p1 = p.annotated_translate()
+        p2 = p.multi_phase_translate()
+        if len(p1) > len(p2):
+            p.prot = p1
+        elif len(p1) < len(p2):
+            p.prot = p2
+        else:
+            p.prot = p1
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         # print(prot_seq)
