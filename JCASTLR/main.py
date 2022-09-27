@@ -54,32 +54,6 @@ def main():
     print(f'{time.perf_counter() - start} seconds')
 
 
-
-
-
-
-
-
-
-
-
-
-#
-#
-#     # loop through each record to get info and translate
-#     num_cores = ((multiprocessing.cpu_count() - 2)*2)
-#     print(num_cores)
-#     with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
-#         with open(fasta) as f:
-#             n1 = 0
-#             for record in SeqIO.parse(f, 'fasta'):
-#                 n1 += 1
-#                 lrf.progress_bar(n1, n, 50)
-#                 executor.submit(paralell_me(record, g, out_location, prefix), record)
-#     sleep(7)
-#     prs.post_run_counts(out_location,prefix)
-#     print(f'{time.perf_counter() - start} seconds')
-
 def paralell_me(record,g,out_location, prefix):
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
@@ -188,32 +162,13 @@ def paralell_me(record,g,out_location, prefix):
         seq = ph.str_to_seqrec()
         lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
 
-        # if ph.old == 'L1':
-        #     # val = L1[-1]
-        #     seq = ph.str_to_seqrec()
-        #     # print("here   ",val)
-        #     lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
-        # elif ph.old == 'L2':
-        #     # val = L2[-1]
-        #     seq = ph.str_to_seqrec()
-        #     lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
-        # elif ph.old == 'L3':
-        #     # val = L3[-1]
-        #     seq = ph.str_to_seqrec()
-        #     lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
-        # elif ph.old == 'L4':
-        #     # val = L4[-1]
-        #     seq = ph.str_to_seqrec()
-        #     lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
-        # elif ph.old == 'L5':
-        #     # val = L5[-1]
-        #     seq = ph.str_to_seqrec()
-        #     lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
-        # else:
-        #     print("error post hoc")
     elif ph.level != 'Canonical':
-        ph.get_aa_uniprot_local('resources/DB/reviewed_included_isoforms.fasta')
+        ph.get_aa_uniprot_local('resources/DB/reviewed_alternative_isoforms.fasta')
         ph.make_header()
+        ph.level_changer()
+        if ph.old != ph.level:
+            print(ph.level,ph.s.level)
+
         seq = ph.str_to_seqrec()
         if ph.level == 'L1':
             # val = L1[-1]

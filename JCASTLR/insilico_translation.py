@@ -446,6 +446,7 @@ class Post_hoc_reassignment():
                              DB,
                              ) -> SeqRecord:
         self.canonical_aa = ''
+        self.old = self.level
         with open(DB) as f:
             for record in SeqIO.parse(f, 'fasta'):
                 if record.seq == self.p.prot:
@@ -468,6 +469,16 @@ class Post_hoc_reassignment():
                 self.s.counts,)
         else:
             self.header = self.header
+
+    def level_changer(self):
+        if self.id.startswith('sp'):
+            if self.header.split('|')[9] == 'protein_coding':
+                self.level = "L1"
+            elif self.level == "L4":
+                self.level = "L3"
+            elif self.level == "L5":
+                self.level = "L3"
+
 
     def str_to_seqrec(self):
         self.rec = SeqRecord(Seq(self.p.prot),self.header,description=self.s.gene_symbol)
