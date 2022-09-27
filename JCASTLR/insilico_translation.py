@@ -60,6 +60,7 @@ class Gtf:
         self.gtf['ids'] = self.gtf["transcript_id"] + "_" + self.gtf["gene_id"]
         self.gtf = pd.merge(self.gtf, df3, on=['ids'], how='right')
         gene_ids = np.unique(self.gtf['gene_id'])
+        print(f'{len(gene_ids)} Filtered transcripts to Process.')
         bools = self.gtf_file.gene_id.isin(gene_ids)
         self.gtf_file = self.gtf_file[bools]
 

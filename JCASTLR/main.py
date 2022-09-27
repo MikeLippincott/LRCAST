@@ -18,6 +18,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 import threading
 import concurrent.futures
+import multiprocessing as mp
 
 # Main function
 def main():
@@ -34,21 +35,32 @@ def main():
     fasta = args.fasta
     prefix = args.file_prefix
     out_location = args.outpath
-    g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
-    g.read_cutoff('results')
-    duplicate_count = 0
     with open(fasta) as f:
         n = 0
         for record in SeqIO.parse(f, 'fasta'):
             n += 1
-    print(f'{n} transcripts to process.')
+        print(f'{n} transcripts to process.')
+    g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
+    g.read_cutoff('results')
+    duplicate_count = 0
 
+    pool = mp.Pool(mp.cpu_count())
+    n1 = 0
     with open(fasta) as f:
-        n1 = 0
-        for record in SeqIO.parse(f, 'fasta'):
-            n1 += 1
-            lrf.progress_bar(n1, n, 50)
-            paralell_me(record, g, out_location, prefix)
+        # for record in SeqIO.parse(f, 'fasta'):
+            # n1 += 1
+            # lrf.progress_bar(n1, n, 50)
+        results = pool.starmap_async(paralell_me, [(record, g, out_location, prefix) for record in SeqIO.parse(f, 'fasta')]).get()
+    pool.close()
+    pool.join()
+
+    # with open(fasta) as f:
+    #     n1 = 0
+    #     for record in SeqIO.parse(f, 'fasta'):
+    #         n1 += 1
+    #         lrf.progress_bar(n1, n, 50)
+              # paralell_me(record, g, out_location, prefix)
+
     sleep(7)
     prs.post_run_counts(out_location,prefix)
     print(f'{time.perf_counter() - start} seconds')
