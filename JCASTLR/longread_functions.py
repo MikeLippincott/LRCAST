@@ -67,8 +67,8 @@ def prot_to_fasta(seqrecord,
 
     for read_record in existing_records:
         if read_record.seq == seqrecord.seq:
-            print('duplicate')
-            outfile = os.path.join(output, prefix + 'JCASTLR_duplicates' + '.fasta')
+            # print('duplicate')
+            outfile = os.path.join(output, prefix + 'JCASTLR_Duplicates' + '.fasta')
             with open(outfile, 'a') as output_handle:
                 SeqIO.write(seqrecord, output_handle, 'fasta')
             return True

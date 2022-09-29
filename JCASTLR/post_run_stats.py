@@ -10,6 +10,8 @@ def post_run_counts( out_location, prefix):
     f3 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level3' + '.fasta')
     f4 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level4' + '.fasta')
     f5 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level5' + '.fasta')
+    dup = os.path.join(out_location, prefix + 'JCASTLR' + '_Duplicates' + '.fasta')
+
 
     with open(fc) as f:
         c = 0
@@ -47,5 +49,14 @@ def post_run_counts( out_location, prefix):
             l5 += 1
         print(f'{l5} Level 5 Isoforms')
 
-    total = c + l1 + l2 + l3 + l4 + l5
+    with open(dup) as f:
+        d = 0
+        for record in SeqIO.parse(f, 'fasta'):
+            d += 1
+        print(f'{d} Level 5 Isoforms')
+
+    total = c + l1 + l2 + l3 + l4 + l5 + d
     print(f'{total} total Catorgized transcripts')
+
+    unique_total = c + l1 + l2 + l3 + l4 + l5
+    print(f'{unique_total} total unique Catorgized transcripts')

@@ -19,6 +19,7 @@ import multiprocessing
 import threading
 import concurrent.futures
 import multiprocessing as mp
+from tqdm import tqdm
 
 # Main function
 def main():
@@ -50,7 +51,12 @@ def main():
         # for record in SeqIO.parse(f, 'fasta'):
             # n1 += 1
             # lrf.progress_bar(n1, n, 50)
-        results = pool.starmap_async(paralell_me, [(record, g, out_location, prefix) for record in SeqIO.parse(f, 'fasta')]).get()
+        results = pool.starmap_async(paralell_me,
+                                     tqdm([(record,
+                                            g,
+                                            out_location,
+                                            prefix) for record in SeqIO.parse(f, 'fasta')]
+                                          ,total =n)).get()
     pool.close()
     pool.join()
 
