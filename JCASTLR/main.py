@@ -26,12 +26,15 @@ def main():
     start = time.perf_counter()
     # Parse Arguments
     parser = argparse.ArgumentParser()
+    parser.add_argument("-m", '--model', action='store_true')
+    parser.add_argument('-r', '--read_cutoff',help='read cutoff value', required=False)
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
     parser.add_argument('-f', '--fasta', help='path to fasta file', required=True)
     parser.add_argument('-p', '--file_prefix', help='filename prefix (not path)', required=True)
     parser.add_argument('-o', '--outpath', help='Output path. Note JCASTLR autonames files', required=True)
     args = parser.parse_args()
     # set constants
+
     gtf = args.gtf
     fasta = args.fasta
     prefix = args.file_prefix
@@ -42,7 +45,13 @@ def main():
             n += 1
         print(f'{n} transcripts to process.')
     g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
-    g.read_cutoff('results')
+    if args.model:
+        g.read_cutoff('results')
+        print("model")
+    else:
+        g.min_count = int(args.read_cutoff)
+    print(g.min_count)
+
     duplicate_count = 0
 
     pool = mp.Pool(mp.cpu_count())
@@ -78,6 +87,8 @@ def paralell_me(record,g,out_location, prefix):
     r = record
     s = ist.Sequences(g, r)
     s.get_counts()
+    # print(s.counts)
+    # if int(s.counts) <= int(g.min_count):
     if s.counts <= g.min_count:
         return 1
     s.subset_gtf()
@@ -184,8 +195,8 @@ def paralell_me(record,g,out_location, prefix):
         ph.get_aa_uniprot_local('resources/DB/reviewed_alternative_isoforms.fasta')
         ph.make_header()
         ph.level_changer()
-        if ph.old != ph.level:
-            print(ph.level,ph.s.level)
+        # if ph.old != ph.level:
+            # print(ph.level,ph.s.level)
 
         seq = ph.str_to_seqrec()
         if ph.level == 'L1':

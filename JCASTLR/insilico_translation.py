@@ -377,18 +377,69 @@ class Peptide(object):
         return pep
 
     # do a multiphase translation using the translate function to find ORFs
+    # def multi_phase_translate(self):
+    #     """
+    #     :return: longest peptide
+    #     """
+    #     d = {}
+    #     for j in [0, 1, 2]:
+    #         a = Peptide.start_find_translate(self.seq, j)
+    #         d[len(a)] = a
+    #         self.prot = d[max(d)]
+    #     return self.prot
+
     def multi_phase_translate(self):
         """
+        :nt: input nucleotide sequence
         :return: longest peptide
         """
-        d = {}
-        for j in [0, 1, 2]:
-            a = Peptide.start_find_translate(self.seq, j)
-            d[len(a)] = a
-            self.prot = d[max(d)]
+        t_len = 0
+        d0 = {}
+        d1 = {}
+        d2 = {}
+        fd = {}
+        lst0 = []
+        lst1 = []
+        lst2 = []
+        while len(self.seq) > t_len:
+            t_len += 3
+
+            for j in [0, 1, 2]:
+                # a = start_find_translate(seq, j)
+                # d[a] = len(a)
+                # prot = [max(d)]
+
+                a = Peptide.start_find_translate(self.seq[t_len:], j)
+                # print(a)
+                if j == 0:
+                    lst0.append(a)
+                elif j == 1:
+                    lst1.append(a)
+                elif j == 2:
+                    lst2.append(a)
+
+        for k in lst0:
+            d0[k] = len(k)
+        for k in lst1:
+            d1[k] = len(k)
+        for k in lst2:
+            d2[k] = len(k)
+        for i, j in zip([d0, d1, d2], range((3))):
+            fd[f'Phase{j}'] = i
+
+        self.prot = 'M'
+        for i in fd:
+            # print(fd[i])
+            for j in fd[i]:
+                if len(j) > len(self.prot):
+                    self.prot = j
+                    p = i
+                else:
+                    pass
+
         return self.prot
 
-    # def get_canonical_aa_uniprot_local(self,
+        # def get_canonical_aa_uniprot_local(self,
     #                                    ) -> SeqRecord:
     #     self.canonical_aa = ''
     #     old = self.level

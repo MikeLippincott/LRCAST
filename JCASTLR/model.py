@@ -94,7 +94,7 @@ def plot_general_mixture_model(ln_sjc,
     fig, ax = plt.subplots(constrained_layout=True, figsize=(10, 4))
     ax.hist(nd_ln, bins=50, histtype='bar', density=True, ec='red', alpha=0.5)
     plt.style.use('seaborn-white')
-    ax.set_xlabel('Natural logarithm of total skipped junction counts')
+    ax.set_xlabel('Natural logarithm of total read counts')
     ax.set_ylabel('Frequency')
     ax.set_title('Read count distributions')
     ax.set_ylim(0, 1)
