@@ -28,6 +28,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", '--model', action='store_true')
     parser.add_argument('-r', '--read_cutoff',help='read cutoff value', required=False)
+    parser.add_argument('-a', '--altORFs', action='store_true')
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
     parser.add_argument('-f', '--fasta', help='path to fasta file', required=True)
     parser.add_argument('-p', '--file_prefix', help='filename prefix (not path)', required=True)
@@ -36,9 +37,12 @@ def main():
     # set constants
 
     gtf = args.gtf
+    global altORFs
+    altORFs = args.altORFs
     fasta = args.fasta
     prefix = args.file_prefix
     out_location = args.outpath
+
     with open(fasta) as f:
         n = 0
         for record in SeqIO.parse(f, 'fasta'):
@@ -77,7 +81,7 @@ def main():
               # paralell_me(record, g, out_location, prefix)
 
     sleep(7)
-    prs.post_run_counts(out_location,prefix)
+    tqdm(prs.post_run_counts(out_location,prefix))
     print(f'{time.perf_counter() - start} seconds')
 
 
@@ -111,6 +115,11 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p2
         else:
             p.prot = p1
+
+        orfs = ist.ORFs(s,p,'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # Canonical.append(seq)
     elif s.level == "L1":
@@ -129,6 +138,10 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p1
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
+        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         # print(prot_seq)
         # seq = p.str_to_seqrec(prot_seq)
         # L1.append(seq)
@@ -148,6 +161,10 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p1
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
+        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L2.append(seq)
     elif s.level == "L3":
@@ -157,6 +174,11 @@ def paralell_me(record,g,out_location, prefix):
         p = ist.Peptide(s)
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
+        p.make_header()
+        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         p.make_header()
         # seq = p.str_to_seqrec(prot_seq)
         # L3.append(seq)
@@ -168,6 +190,10 @@ def paralell_me(record,g,out_location, prefix):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
+        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L4.append(seq)
     elif s.level == "L5":
@@ -177,6 +203,10 @@ def paralell_me(record,g,out_location, prefix):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
+        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                               'resources/DB/reviewed_alternative_isoforms.fasta')
+        orfs.dict_parse()
+        orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L5.append(seq)
     else:

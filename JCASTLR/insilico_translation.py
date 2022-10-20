@@ -7,6 +7,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from pybiomart import Server # for retrieval of Uniprot IDs
 import constants
+import longread_functions as lrf
 # from JCASTLR import longread_functions as lrf
 import gget
 import sqlite3 as sq
@@ -350,6 +351,32 @@ class Peptide(object):
             # print(self.prot)
         return self.prot
 
+    # @staticmethod
+    # def start_find_translate(nt, phase):
+    #     """
+    #     :nt: input nucleotide sequence
+    #     :phase: integer 0-2 which phase to translate in
+    #     :return: longest peptide
+    #     """
+    #     code = constants.genetic_code
+    #     pep = ''
+    #     for i in range(phase, len(nt) - 2, 3):
+    #         if 'N' in nt[i:i+3]:
+    #             aa = 'U'
+    #         else:
+    #             aa = code[nt[i:i + 3]]
+    #         if len(pep) == 0:
+    #             if aa == 'M':
+    #                 pep += aa
+    #                 # print(i)
+    #         elif len(pep) > 0:
+    #             if aa == 'X':
+    #                 return pep
+    #             else:
+    #                 pep += aa
+    #     # print(len(pep),", ",pep)
+    #     return pep
+
     @staticmethod
     def start_find_translate(nt, phase):
         """
@@ -359,22 +386,30 @@ class Peptide(object):
         """
         code = constants.genetic_code
         pep = ''
+        start = 0
+        stop = 0
         for i in range(phase, len(nt) - 2, 3):
-            if 'N' in nt[i:i+3]:
+            if 'N' in nt[i:i + 3]:
                 aa = 'U'
             else:
                 aa = code[nt[i:i + 3]]
             if len(pep) == 0:
                 if aa == 'M':
+                    start = i
                     pep += aa
                     # print(i)
             elif len(pep) > 0:
                 if aa == 'X':
-                    return pep
+                    stop = i
+                    if start == 0:
+                        start = 0
+                    if stop == 0:
+                        stop = 0
+                    return pep, start, stop
                 else:
                     pep += aa
         # print(len(pep),", ",pep)
-        return pep
+        return pep, start, stop
 
     # do a multiphase translation using the translate function to find ORFs
     # def multi_phase_translate(self):
@@ -386,6 +421,57 @@ class Peptide(object):
     #         a = Peptide.start_find_translate(self.seq, j)
     #         d[len(a)] = a
     #         self.prot = d[max(d)]
+    #     return self.prot
+
+    # def multi_phase_translate(self):
+    #     """
+    #     :nt: input nucleotide sequence
+    #     :return: longest peptide
+    #     """
+    #     t_len = 0
+    #     d0 = {}
+    #     d1 = {}
+    #     d2 = {}
+    #     fd = {}
+    #     lst0 = []
+    #     lst1 = []
+    #     lst2 = []
+    #     while len(self.seq) > t_len:
+    #         t_len += 3
+    #
+    #         for j in [0, 1, 2]:
+    #             # a = start_find_translate(seq, j)
+    #             # d[a] = len(a)
+    #             # prot = [max(d)]
+    #
+    #             a = Peptide.start_find_translate(self.seq[t_len:], j)
+    #             # print(a)
+    #             if j == 0:
+    #                 lst0.append(a)
+    #             elif j == 1:
+    #                 lst1.append(a)
+    #             elif j == 2:
+    #                 lst2.append(a)
+    #
+    #     for k in lst0:
+    #         d0[k] = len(k)
+    #     for k in lst1:
+    #         d1[k] = len(k)
+    #     for k in lst2:
+    #         d2[k] = len(k)
+    #     for i, j in zip([d0, d1, d2], range((3))):
+    #         fd[f'Phase{j}'] = i
+    #
+    #     self.prot = 'M'
+    #     for i in fd:
+    #         # print(fd[i])
+    #         for j in fd[i]:
+    #             if len(j) > len(self.prot):
+    #                 self.prot = j
+    #                 p = i
+    #             else:
+    #                 pass
+    #
     #     return self.prot
 
     def multi_phase_translate(self):
@@ -401,42 +487,60 @@ class Peptide(object):
         lst0 = []
         lst1 = []
         lst2 = []
+        total_length = len(self.seq)
+        start = 0
+        stop = 0
+        self.dict2 = {}
         while len(self.seq) > t_len:
             t_len += 3
-
+            dict1 = {'phase': [], 'len': [], 'start': [], 'stop': []}
             for j in [0, 1, 2]:
                 # a = start_find_translate(seq, j)
                 # d[a] = len(a)
                 # prot = [max(d)]
 
-                a = Peptide.start_find_translate(self.seq[t_len:], j)
+                a, start, stop = Peptide.start_find_translate(self.seq[t_len:], j)
+                dict1 = {'phase': [], 'len': [], 'start': [], 'stop': []}
                 # print(a)
                 if j == 0:
-                    lst0.append(a)
+                    dict1['phase'].append(f'Phase{j}')
+                    dict1['len'].append(len(a))
+                    dict1['start'].append(start + t_len)
+                    dict1['stop'].append(stop + t_len)
+                    # dict2[a] = dict1
                 elif j == 1:
-                    lst1.append(a)
-                elif j == 2:
-                    lst2.append(a)
+                    dict1['phase'].append(f'Phase{j}')
+                    dict1['len'].append(len(a))
 
-        for k in lst0:
-            d0[k] = len(k)
-        for k in lst1:
-            d1[k] = len(k)
-        for k in lst2:
-            d2[k] = len(k)
-        for i, j in zip([d0, d1, d2], range((3))):
-            fd[f'Phase{j}'] = i
+                    dict1['start'].append(start + t_len)
+                    dict1['stop'].append(stop + t_len)
+                    # dict2[a] = dict1
+
+                elif j == 2:
+                    dict1['phase'].append(f'Phase{j}')
+                    dict1['len'].append(len(a))
+                    dict1['start'].append(start + t_len)
+                    dict1['stop'].append(stop + t_len)
+                self.dict2[a] = dict1
+
+        # for k in lst0:
+        #     d0[k] = len(k)
+        # for k in lst1:
+        #     d1[k] = len(k)
+        # for k in lst2:
+        #     d2[k] = len(k)
+        # for i,j in zip([d0,d1,d2],range((3))):
+        #     fd[f'Phase{j}'] = i
 
         self.prot = 'M'
-        for i in fd:
+        for j in self.dict2:
             # print(fd[i])
-            for j in fd[i]:
-                if len(j) > len(self.prot):
-                    self.prot = j
-                    p = i
-                else:
-                    pass
+            if len(j) > len(self.prot):
+                self.prot = j
+            else:
+                pass
 
+        # return k
         return self.prot
 
         # def get_canonical_aa_uniprot_local(self,
@@ -537,13 +641,17 @@ class Post_hoc_reassignment():
         # print(self.rec)
         return self.rec
 
-
-class Post_hoc_reclassification():
+class ORFs:
     def __init__(self,
-                 record):
-        self.prot = record.seq
-        self.header = record.id.split('|')
-        self.level = self.header[0]
+                 sequence: Sequences,
+                 peptide: Peptide,
+                 CanDB,
+                 IsoDB):
+        self.orfs = peptide.dict2
+
+        self.header = peptide.header.split('|')
+        self.header_orf = peptide.header
+        self.level = 'ORF'
         self.gene_symbol = self.header[1]
         self.gid = self.header[2]
         self.tid = self.header[3]
@@ -553,70 +661,97 @@ class Post_hoc_reclassification():
         self.tsl = self.header[7]
         self.counts = self.header[8]
         self.id = '-'
-        print("Post-Hoc reclassification")
+        self.CanDB = CanDB
+        self.IsoDB = IsoDB
 
-    def get_canonical_aa_uniprot_local(self,
-                                       DB,
-                                       ) -> SeqRecord:
-        self.canonical_aa = ''
-        self.old = self.level
-        with open(DB) as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                if record.seq == self.prot:
-                    self.level = 'Canonical'
-                    self.id = record.id
 
-    def get_aa_uniprot_local(self,
-                             DB,
-                             ) -> SeqRecord:
-        self.canonical_aa = ''
-        with open(DB) as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                if record.seq == self.prot:
-                    self.id = record.id
+    @staticmethod
+    def string_fix(lst):
+        return lst[0]
 
-    def make_header(self):
-        if self.id != '-':
-            self.header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|".format(
+    def dict_parse(self):
+
+
+        converted = pd.DataFrame.from_dict(self.orfs, orient='index')
+        converted['phase'] = converted['phase'].apply(ORFs.string_fix)
+        converted['len'] = converted['len'].apply(ORFs.string_fix)
+        converted['start'] = converted['start'].apply(ORFs.string_fix)
+        converted['stop'] = converted['stop'].apply(ORFs.string_fix)
+        for i in converted.index:
+            if i == '':
+                converted = converted.drop(i)
+        max_value = converted['len'].max()
+        converted = converted[converted.len != max_value]
+        self.converted = converted
+
+    def write_header_loop(self, out_location, prefix):
+
+        for i in self.converted.index:
+            phase = self.converted.loc[i]['phase']
+            length = self.converted.loc[i]['len']
+            start = self.converted.loc[i]['start']
+            stop = self.converted.loc[i]['stop']
+            pep = i
+            header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
                 self.level,
                 self.gene_symbol,
                 self.gid,
                 self.tid,
                 self.strand,
-                self.chromosome,
+                f'Chr{self.chromosome}',
                 self.biotype,
                 self.tsl,
-                self.counts,)
-        else:
-            self.header = self.header
-
-    def str_to_seqrec(self):
-        self.rec = SeqRecord(self.prot,f'{self.header}',description=self.gene_symbol)
-        return self.rec
-
-    def reassignment(self):
-        C = []
-        L1 = []
-        L2 = []
-        L3 = []
-        L4 = []
-        L5 = []
-        if self.level == 'Canonical':
-            C.append(self.rec)
-        elif self.level == 'L1':
-            L1.append(self.rec)
-        elif self.level == 'L2':
-            L2.append(self.rec)
-        elif self.level == 'L3':
-            L3.append(self.rec)
-        elif self.level == 'L4':
-            L4.append(self.rec)
-        elif self.level == 'L5':
-            L5.append(self.rec)
-        else:
-            print("error post hoc")
+                self.counts,
+                f'Len={length}',
+                f'Start_Site_{start}',
+                f'Stop_Site_{stop}',
+                f'{phase}',)
 
 
+            self.canonical_aa = ''
+            self.old = self.level
+            with open(self.CanDB) as f:
+                for record in SeqIO.parse(f, 'fasta'):
+                    if record.seq == pep:
+                        self.level = 'Canonical'
+                        self.id = record.id
+
+
+            self.canonical_aa = ''
+            self.old = self.level
+            with open(self.IsoDB) as f:
+                for record in SeqIO.parse(f, 'fasta'):
+                    if record.seq == pep:
+                        self.id = record.id
+            if self.id != '-':
+                header = self.id + "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                    self.level,
+                    self.gene_symbol,
+                    self.gid,
+                    self.tid,
+                    self.strand,
+                    f'Chr{self.chromosome}',
+                    self.biotype,
+                    self.tsl,
+                    self.counts,
+                    f'Len={length}',
+                    f'Start_Site_{start}',
+                    f'Stop_Site_{stop}',
+                    f'{phase}', )
+            else:
+                header = self.header_orf
+
+            if self.id.startswith('sp'):
+                if self.header.split('|')[9] == 'protein_coding':
+                    self.level = "L1"
+                elif self.level == "L4":
+                    self.level = "L3"
+                elif self.level == "L5":
+                    self.level = "L3"
+
+            rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+
+            lrf.prot_to_fasta(rec, out_location, prefix, "_altORFs")
 
 
 

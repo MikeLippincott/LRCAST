@@ -1,9 +1,10 @@
 import os
 import Bio
 from Bio import SeqIO
+import main
 
 
-def post_run_counts( out_location, prefix):
+def post_run_counts(out_location, prefix, orf_var):
     fc = os.path.join(out_location, prefix + 'JCASTLR' + '_Canonical' + '.fasta')
     f1 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level1' + '.fasta')
     f2 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level2' + '.fasta')
@@ -11,6 +12,7 @@ def post_run_counts( out_location, prefix):
     f4 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level4' + '.fasta')
     f5 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level5' + '.fasta')
     dup = os.path.join(out_location, prefix + 'JCASTLR' + '_Duplicates' + '.fasta')
+    aORF =  os.path.join(out_location, prefix + 'JCASTLR' + '_altORFs' + '.fasta')
 
 
     with open(fc) as f:
@@ -53,10 +55,26 @@ def post_run_counts( out_location, prefix):
         d = 0
         for record in SeqIO.parse(f, 'fasta'):
             d += 1
-        print(f'{d} Level 5 Isoforms')
+        print(f'{d} Duplicate Isoforms')
 
-    total = c + l1 + l2 + l3 + l4 + l5 + d
-    print(f'{total} total Catorgized transcripts')
+    if orf_var:
 
-    unique_total = c + l1 + l2 + l3 + l4 + l5
-    print(f'{unique_total} total unique Catorgized transcripts')
+        with open(aORF) as f:
+            a = 0
+            for record in SeqIO.parse(f, 'fasta'):
+                a += 1
+            print(f'{a} Duplicate Isoforms')
+
+        total = c + l1 + l2 + l3 + l4 + l5 + d + a
+        print(f'{total} total Catorgized transcripts')
+
+        unique_total = c + l1 + l2 + l3 + l4 + l5 + a
+        print(f'{unique_total} total unique Catorgized transcripts')
+
+    else:
+
+        total = c + l1 + l2 + l3 + l4 + l5 + d
+        print(f'{total} total Catorgized transcripts')
+
+        unique_total = c + l1 + l2 + l3 + l4 + l5
+        print(f'{unique_total} total unique Catorgized transcripts')
