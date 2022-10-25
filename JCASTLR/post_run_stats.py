@@ -4,6 +4,8 @@ from Bio import SeqIO
 import main
 
 
+
+
 def post_run_counts(out_location, prefix, orf_var):
     fc = os.path.join(out_location, prefix + 'JCASTLR' + '_Canonical' + '.fasta')
     f1 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level1' + '.fasta')
@@ -13,6 +15,7 @@ def post_run_counts(out_location, prefix, orf_var):
     f5 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level5' + '.fasta')
     dup = os.path.join(out_location, prefix + 'JCASTLR' + '_Duplicates' + '.fasta')
     aORF =  os.path.join(out_location, prefix + 'JCASTLR' + '_altORFs' + '.fasta')
+
 
 
     with open(fc) as f:
@@ -63,7 +66,7 @@ def post_run_counts(out_location, prefix, orf_var):
             a = 0
             for record in SeqIO.parse(f, 'fasta'):
                 a += 1
-            print(f'{a} Duplicate Isoforms')
+            print(f'{a} altORF Isoforms')
 
         total = c + l1 + l2 + l3 + l4 + l5 + d + a
         print(f'{total} total Catorgized transcripts')

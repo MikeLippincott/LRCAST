@@ -39,6 +39,8 @@ def main():
     gtf = args.gtf
     global altORFs
     altORFs = args.altORFs
+    # global it
+    # it = 0
     fasta = args.fasta
     prefix = args.file_prefix
     out_location = args.outpath
@@ -65,11 +67,12 @@ def main():
             # n1 += 1
             # lrf.progress_bar(n1, n, 50)
         results = pool.starmap_async(paralell_me,
-                                     tqdm([(record,
+                                     [(record,
                                             g,
                                             out_location,
-                                            prefix) for record in SeqIO.parse(f, 'fasta')]
-                                          ,total =n)).get()
+                                            prefix) for record in SeqIO.parse(f, 'fasta')]).get()
+        tqdm(total=n)
+
     pool.close()
     pool.join()
 
@@ -81,7 +84,8 @@ def main():
               # paralell_me(record, g, out_location, prefix)
 
     sleep(7)
-    tqdm(prs.post_run_counts(out_location,prefix))
+    print('Starting Post Run Analysis')
+    prs.post_run_counts(out_location,prefix,altORFs)
     print(f'{time.perf_counter() - start} seconds')
 
 
@@ -254,5 +258,7 @@ def paralell_me(record,g,out_location, prefix):
             print("error post hoc")
     else:
         print("Error")
-
+    # it += 1
+    # print(it)
+    print("completed")
 

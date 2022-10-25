@@ -77,6 +77,36 @@ def prot_to_fasta(seqrecord,
         SeqIO.write(seqrecord, output_handle, 'fasta')
 
 
+# export function peptide sequence to fasta
+def prot_to_fasta_ORF(seqrecord,
+                  output,
+                  prefix,
+                  suffix):
+    """
+    :param seqrecord: BioSeq seqrecord record object
+    :param output: output path
+    :param suffix: string to be added to filename before extension
+    :return: fasta file
+    """
+    outfile = os.path.join(output, prefix + 'JCASTLR' + suffix + '.fasta')
+    # if the file already exists, open it and amend that record.
+    existing_records = []
+    if os.path.exists(outfile):
+        for existing_record in SeqIO.parse(outfile, 'fasta'):
+            existing_records.append(existing_record)
+    else:
+        with open(outfile, 'w') as f:
+            SeqIO.write(seqrecord, f, 'fasta')
+
+    for read_record in existing_records:
+        if read_record.seq == seqrecord.seq:
+            # print('duplicate')
+            return True
+
+    with open(outfile, 'a') as output_handle:
+        SeqIO.write(seqrecord, output_handle, 'fasta')
+
+
 # progress bar for run time estimation
 def progress_bar(current,
                  total,

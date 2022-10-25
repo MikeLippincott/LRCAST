@@ -574,6 +574,111 @@ class Peptide(object):
         return self.rec
 
 
+class ORFs:
+    def __init__(self,
+                 sequence: Sequences,
+                 peptide: Peptide,
+                 CanDB,
+                 IsoDB):
+        self.orfs = peptide.dict2
+
+        self.header = peptide.header.split('|')
+        self.header_orf = peptide.header
+        self.level = 'ORF'
+        self.gene_symbol = self.header[1]
+        self.gid = self.header[2]
+        self.tid = self.header[3]
+        self.strand = self.header[4]
+        self.chromosome = self.header[5]
+        self.biotype = self.header[6]
+        self.tsl = self.header[7]
+        self.counts = self.header[8]
+        self.id = '-'
+        self.CanDB = CanDB
+        self.IsoDB = IsoDB
+
+
+    @staticmethod
+    def string_fix(lst):
+        return lst[0]
+
+    def dict_parse(self):
+
+
+        converted = pd.DataFrame.from_dict(self.orfs, orient='index')
+        converted['phase'] = converted['phase'].apply(ORFs.string_fix)
+        converted['len'] = converted['len'].apply(ORFs.string_fix)
+        converted['start'] = converted['start'].apply(ORFs.string_fix)
+        converted['stop'] = converted['stop'].apply(ORFs.string_fix)
+        for i in converted.index:
+            if i == '':
+                converted = converted.drop(i)
+        max_value = converted['len'].max()
+        converted = converted[converted.len != max_value]
+        self.converted = converted
+
+    def write_header_loop(self, out_location, prefix):
+
+        for i in self.converted.index:
+            self.id = '-'
+            phase = self.converted.loc[i]['phase']
+            length = self.converted.loc[i]['len']
+            start = self.converted.loc[i]['start']
+            stop = self.converted.loc[i]['stop']
+            pep = i
+
+            self.old = self.level
+            with open(self.CanDB) as f:
+                for record in SeqIO.parse(f, 'fasta'):
+                    if record.seq == pep:
+                        print(record.seq,'-------',pep)
+                        print(record.id)
+                        self.level = 'Canonical'
+                        self.id = record.id
+
+            self.old = self.level
+            with open(self.IsoDB) as f:
+                for record in SeqIO.parse(f, 'fasta'):
+                    if record.seq == pep:
+                        print(record.seq, '-------', pep)
+                        print(record.id)
+                        self.id = record.id
+
+            if self.id != '-':
+                header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                    self.level,
+                    self.gene_symbol,
+                    self.gid,
+                    self.tid,
+                    self.strand,
+                    self.chromosome,
+                    self.biotype,
+                    self.tsl,
+                    self.counts,
+                    f'Len={length}',
+                    f'Start_Site_{start}',
+                    f'Stop_Site_{stop}',
+                    f'{phase}', )
+            else:
+                header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                    self.level,
+                    self.gene_symbol,
+                    self.gid,
+                    self.tid,
+                    self.strand,
+                    self.chromosome,
+                    self.biotype,
+                    self.tsl,
+                    self.counts,
+                    f'Len={length}',
+                    f'Start_Site_{start}',
+                    f'Stop_Site_{stop}',
+                    f'{phase}', )
+
+            rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+
+            lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+
 
 class Post_hoc_reassignment():
     def __init__(self,
@@ -640,118 +745,6 @@ class Post_hoc_reassignment():
         self.rec = SeqRecord(Seq(self.p.prot),self.header,description=self.s.gene_symbol)
         # print(self.rec)
         return self.rec
-
-class ORFs:
-    def __init__(self,
-                 sequence: Sequences,
-                 peptide: Peptide,
-                 CanDB,
-                 IsoDB):
-        self.orfs = peptide.dict2
-
-        self.header = peptide.header.split('|')
-        self.header_orf = peptide.header
-        self.level = 'ORF'
-        self.gene_symbol = self.header[1]
-        self.gid = self.header[2]
-        self.tid = self.header[3]
-        self.strand = self.header[4]
-        self.chromosome = self.header[5]
-        self.biotype = self.header[6]
-        self.tsl = self.header[7]
-        self.counts = self.header[8]
-        self.id = '-'
-        self.CanDB = CanDB
-        self.IsoDB = IsoDB
-
-
-    @staticmethod
-    def string_fix(lst):
-        return lst[0]
-
-    def dict_parse(self):
-
-
-        converted = pd.DataFrame.from_dict(self.orfs, orient='index')
-        converted['phase'] = converted['phase'].apply(ORFs.string_fix)
-        converted['len'] = converted['len'].apply(ORFs.string_fix)
-        converted['start'] = converted['start'].apply(ORFs.string_fix)
-        converted['stop'] = converted['stop'].apply(ORFs.string_fix)
-        for i in converted.index:
-            if i == '':
-                converted = converted.drop(i)
-        max_value = converted['len'].max()
-        converted = converted[converted.len != max_value]
-        self.converted = converted
-
-    def write_header_loop(self, out_location, prefix):
-
-        for i in self.converted.index:
-            phase = self.converted.loc[i]['phase']
-            length = self.converted.loc[i]['len']
-            start = self.converted.loc[i]['start']
-            stop = self.converted.loc[i]['stop']
-            pep = i
-            header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                self.level,
-                self.gene_symbol,
-                self.gid,
-                self.tid,
-                self.strand,
-                f'Chr{self.chromosome}',
-                self.biotype,
-                self.tsl,
-                self.counts,
-                f'Len={length}',
-                f'Start_Site_{start}',
-                f'Stop_Site_{stop}',
-                f'{phase}',)
-
-
-            self.canonical_aa = ''
-            self.old = self.level
-            with open(self.CanDB) as f:
-                for record in SeqIO.parse(f, 'fasta'):
-                    if record.seq == pep:
-                        self.level = 'Canonical'
-                        self.id = record.id
-
-
-            self.canonical_aa = ''
-            self.old = self.level
-            with open(self.IsoDB) as f:
-                for record in SeqIO.parse(f, 'fasta'):
-                    if record.seq == pep:
-                        self.id = record.id
-            if self.id != '-':
-                header = self.id + "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                    self.level,
-                    self.gene_symbol,
-                    self.gid,
-                    self.tid,
-                    self.strand,
-                    f'Chr{self.chromosome}',
-                    self.biotype,
-                    self.tsl,
-                    self.counts,
-                    f'Len={length}',
-                    f'Start_Site_{start}',
-                    f'Stop_Site_{stop}',
-                    f'{phase}', )
-            else:
-                header = self.header_orf
-
-            if self.id.startswith('sp'):
-                if self.header.split('|')[9] == 'protein_coding':
-                    self.level = "L1"
-                elif self.level == "L4":
-                    self.level = "L3"
-                elif self.level == "L5":
-                    self.level = "L3"
-
-            rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
-
-            lrf.prot_to_fasta(rec, out_location, prefix, "_altORFs")
 
 
 

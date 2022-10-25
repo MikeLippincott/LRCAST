@@ -69,28 +69,28 @@ def fasta_merge(can,
 
 
 def main():
-    for i in range(0,550,50):
-        fasta_merge('resources/DB/reviewed_canonical.fasta',
-                    'test_runJCASTLR_C_1_2_3_4_5.fasta',
-                    'canonical' ,
-                    'jcast_all' ,
-                    'cut_off' ,
-                    'all_levels',
-                    '.',
-                    i)
+    # for i in range(0,550,50):
+    fasta_merge('resources/DB/reviewed_canonical.fasta',
+                'aORFsJCASTLR_C_1_2_3_4_5.fasta',
+                'canonical' ,
+                'jcast_all' ,
+                'aORFs' ,
+                'all_levels',
+                '.',
+                0)
+    fasta_merge('resources/DB/reviewed_included_isoforms.fasta',
+                'aORFsJCASTLR_C_1_2_3_4_5.fasta',
+                'canonical+isoform',
+                'jcast_all',
+                'aORFs',
+                'all_levels',
+                '.',
+                0)
 
 if __name__ == '__main__':
     main()
 
-for i in range(0,550,50):
-    fasta_merge('resources/DB/reviewed_canonical.fasta',
-                'test_runJCASTLR_Level5.fasta',
-                'canonical' ,
-                'test_run' ,
-                'cut_off' ,
-                'jcast_level5',
-                '.',
-                i)
+
 
 
 def DB_generate():
@@ -159,25 +159,3 @@ def DB_generate():
 # print(i)
 
 
-
-########
-lst = []
-df = pd.read_table('/Users/mike/OneDrive - The University of Colorado Denver/Rotaion I Lau Lab/Mass_Spec_Analysis/2022_10_04_C_1_2_3_4_5/percolator.target.proteins.txt')
-for i in df['ProteinId']:
-  # print(i)
-  lst.append(f'{i.split("|")[0]}|{i.split("|")[1]}|{i.split("|")[2]}')
-  #   print((f'{i.split("|")[0]}|{i.split("|")[1]}|{i.split("|")[2]}'))
-
-
-
-df['match'] = lst
-
-def new_column(df):
-  lst = []
-  # df = pd.read_table(df)
-  for i in df['ProteinId']:
-    # print(i)
-    lst.append(f'{i.split("|")[0]}|{i.split("|")[1]}|{i.split("|")[2]}')
-    #   print((f'{i.split("|")[0]}|{i.split("|")[1]}|{i.split("|")[2]}'))
-    df['match'] = lst
-new_column(df)
