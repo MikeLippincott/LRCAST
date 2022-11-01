@@ -20,10 +20,13 @@ import threading
 import concurrent.futures
 import multiprocessing as mp
 from tqdm import tqdm
+import scalene
+from scalene import scalene_profiler
 
 # Main function
 def main():
     start = time.perf_counter()
+    scalene_profiler.start()
     # Parse Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", '--model', action='store_true')
@@ -61,32 +64,30 @@ def main():
     duplicate_count = 0
 
     pool = mp.Pool(mp.cpu_count())
+
+
+    print("start")
     n1 = 0
+    # pbar = tqdm(total=n)
     with open(fasta) as f:
-        # for record in SeqIO.parse(f, 'fasta'):
-            # n1 += 1
-            # lrf.progress_bar(n1, n, 50)
-        results = pool.starmap_async(paralell_me,
-                                     [(record,
+
+        result = pool.starmap_async(paralell_me,
+                                     tqdm([(record,
                                             g,
                                             out_location,
-                                            prefix) for record in SeqIO.parse(f, 'fasta')]).get()
-        tqdm(total=n)
-
+                                            prefix) for record in SeqIO.parse(f, 'fasta')])).get()
     pool.close()
     pool.join()
 
-    # with open(fasta) as f:
-    #     n1 = 0
-    #     for record in SeqIO.parse(f, 'fasta'):
-    #         n1 += 1
-    #         lrf.progress_bar(n1, n, 50)
-              # paralell_me(record, g, out_location, prefix)
+        # for record in SeqIO.parse(f, 'fasta'):
+        #     paralell_me(record,g,out_location,prefix)
 
-    sleep(7)
+
+    sleep(15)
     print('Starting Post Run Analysis')
     prs.post_run_counts(out_location,prefix,altORFs)
     print(f'{time.perf_counter() - start} seconds')
+    scalene_profiler.stop()
 
 
 def paralell_me(record,g,out_location, prefix):
@@ -119,11 +120,11 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p2
         else:
             p.prot = p1
-
-        orfs = ist.ORFs(s,p,'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s,p,'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # Canonical.append(seq)
     elif s.level == "L1":
@@ -142,10 +143,11 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p1
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
-        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         # print(prot_seq)
         # seq = p.str_to_seqrec(prot_seq)
         # L1.append(seq)
@@ -165,10 +167,11 @@ def paralell_me(record,g,out_location, prefix):
             p.prot = p1
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
-        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L2.append(seq)
     elif s.level == "L3":
@@ -179,10 +182,11 @@ def paralell_me(record,g,out_location, prefix):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
-        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         p.make_header()
         # seq = p.str_to_seqrec(prot_seq)
         # L3.append(seq)
@@ -194,10 +198,11 @@ def paralell_me(record,g,out_location, prefix):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
-        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L4.append(seq)
     elif s.level == "L5":
@@ -207,10 +212,11 @@ def paralell_me(record,g,out_location, prefix):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
-        orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
-                               'resources/DB/reviewed_alternative_isoforms.fasta')
-        orfs.dict_parse()
-        orfs.write_header_loop(out_location, prefix)
+        if altORFs:
+            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+                                   'resources/DB/reviewed_alternative_isoforms.fasta')
+            orfs.dict_parse()
+            orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L5.append(seq)
     else:
@@ -260,5 +266,9 @@ def paralell_me(record,g,out_location, prefix):
         print("Error")
     # it += 1
     # print(it)
-    print("completed")
+    # print("completed")
+    # pbar.update(1)
 
+
+if __name__ == "__main__":
+    main()

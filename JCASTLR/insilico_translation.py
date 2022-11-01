@@ -631,8 +631,8 @@ class ORFs:
             with open(self.CanDB) as f:
                 for record in SeqIO.parse(f, 'fasta'):
                     if record.seq == pep:
-                        print(record.seq,'-------',pep)
-                        print(record.id)
+                        # print(record.seq,'-------',pep)
+                        # print(record.id)
                         self.level = 'Canonical'
                         self.id = record.id
 
@@ -640,8 +640,8 @@ class ORFs:
             with open(self.IsoDB) as f:
                 for record in SeqIO.parse(f, 'fasta'):
                     if record.seq == pep:
-                        print(record.seq, '-------', pep)
-                        print(record.id)
+                        # print(record.seq, '-------', pep)
+                        # print(record.id)
                         self.id = record.id
 
             if self.id != '-':
