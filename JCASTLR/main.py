@@ -22,6 +22,7 @@ import multiprocessing as mp
 from tqdm import tqdm
 import scalene
 from scalene import scalene_profiler
+global altORFs
 
 # Main function
 def main():
@@ -40,7 +41,7 @@ def main():
     # set constants
 
     gtf = args.gtf
-    global altORFs
+
     altORFs = args.altORFs
     # it = 0
     fasta = args.fasta
@@ -61,25 +62,22 @@ def main():
     print(g.min_count)
 
     duplicate_count = 0
-
+    print(mp.cpu_count())
     pool = mp.Pool(mp.cpu_count())
 
-
-    print("start")
-    n1 = 0
-    # pbar = tqdm(total=n)
     with open(fasta) as f:
 
         result = pool.starmap_async(paralell_me,
                                      tqdm([(record,
                                             g,
                                             out_location,
-                                            prefix) for record in SeqIO.parse(f, 'fasta')])).get()
+                                            prefix, altORFs) for record in SeqIO.parse(f, 'fasta')])).get()
+
+
     pool.close()
     pool.join()
 
-        # for record in SeqIO.parse(f, 'fasta'):
-        #     paralell_me(record,g,out_location,prefix)
+
 
 
     sleep(15)
@@ -89,7 +87,7 @@ def main():
 
 
 
-def paralell_me(record,g,out_location, prefix):
+def paralell_me(record,g,out_location, prefix, altORFs):
     # scalene_profiler.start()
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
@@ -271,7 +269,6 @@ def paralell_me(record,g,out_location, prefix):
     # print("completed")
     # pbar.update(1)
     # scalene_profiler.stop()
-
 
 if __name__ == "__main__":
     main()

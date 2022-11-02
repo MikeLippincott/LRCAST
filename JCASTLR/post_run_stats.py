@@ -14,7 +14,7 @@ def post_run_counts(out_location, prefix, orf_var):
     f4 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level4' + '.fasta')
     f5 = os.path.join(out_location, prefix + 'JCASTLR' + '_Level5' + '.fasta')
     dup = os.path.join(out_location, prefix + 'JCASTLR' + '_Duplicates' + '.fasta')
-    aORF =  os.path.join(out_location, prefix + 'JCASTLR' + '_altORFs' + '.fasta')
+    aORF = os.path.join(out_location, prefix + 'JCASTLR' + '_altORFs' + '.fasta')
 
 
 
