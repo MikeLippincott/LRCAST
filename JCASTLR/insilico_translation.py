@@ -18,6 +18,9 @@ import requests as rq
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from io import StringIO
+import multiprocessing as mp
+from tqdm import tqdm
+from scalene import scalene_profiler
 from time import sleep
 import model
 import logging
@@ -36,6 +39,17 @@ class Gtf:
         # Ensembl gtf
         self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
         self.counts = pd.read_table(counts_matrix)
+        print("LOADING sp DATABASES")
+        canDB = 'resources/DB/reviewed_canonical.fasta'
+        IsoDB = 'resources/DB/reviewed_alternative_isoforms.fasta'
+        self.can = {}
+        with open(canDB) as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                self.can[record.seq] = record.id
+        self.iso = {}
+        with open(IsoDB) as f:
+            for record in SeqIO.parse(f, 'fasta'):
+                self.iso[record.seq] = record.id
 
     def read_cutoff(self, write_dir):
         exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
@@ -578,10 +592,12 @@ class ORFs:
     def __init__(self,
                  sequence: Sequences,
                  peptide: Peptide,
+                 gtf: Gtf,
                  CanDB,
                  IsoDB):
         self.orfs = peptide.dict2
-
+        self.iso = gtf.iso
+        self.can = gtf.can
         self.header = peptide.header.split('|')
         self.header_orf = peptide.header
         self.level = 'ORF'
@@ -618,7 +634,7 @@ class ORFs:
         self.converted = converted
 
     def write_header_loop(self, out_location, prefix):
-
+        scalene_profiler.start()
         for i in self.converted.index:
             self.id = '-'
             phase = self.converted.loc[i]['phase']
@@ -626,58 +642,162 @@ class ORFs:
             start = self.converted.loc[i]['start']
             stop = self.converted.loc[i]['stop']
             pep = i
-
             self.old = self.level
-            with open(self.CanDB) as f:
-                for record in SeqIO.parse(f, 'fasta'):
-                    if record.seq == pep:
-                        # print(record.seq,'-------',pep)
-                        # print(record.id)
-                        self.level = 'Canonical'
-                        self.id = record.id
 
-            self.old = self.level
-            with open(self.IsoDB) as f:
-                for record in SeqIO.parse(f, 'fasta'):
-                    if record.seq == pep:
-                        # print(record.seq, '-------', pep)
-                        # print(record.id)
-                        self.id = record.id
+        if pep == self.can.keys():
+            self.level = 'Canonical'
+            self.id = self.can[pep]
+            print(self.id)
 
-            if self.id != '-':
-                header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                    self.level,
-                    self.gene_symbol,
-                    self.gid,
-                    self.tid,
-                    self.strand,
-                    self.chromosome,
-                    self.biotype,
-                    self.tsl,
-                    self.counts,
-                    f'Len={length}',
-                    f'Start_Site_{start}',
-                    f'Stop_Site_{stop}',
-                    f'{phase}', )
-            else:
-                header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                    self.level,
-                    self.gene_symbol,
-                    self.gid,
-                    self.tid,
-                    self.strand,
-                    self.chromosome,
-                    self.biotype,
-                    self.tsl,
-                    self.counts,
-                    f'Len={length}',
-                    f'Start_Site_{start}',
-                    f'Stop_Site_{stop}',
-                    f'{phase}', )
+        if pep in self.iso.keys():
+            self.id = self.can[pep]
+            print(self.id)
 
-            rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+        if self.id != '-':
+            header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                self.level,
+                self.gene_symbol,
+                self.gid,
+                self.tid,
+                self.strand,
+                self.chromosome,
+                self.biotype,
+                self.tsl,
+                self.counts,
+                f'Len={length}',
+                f'Start_Site_{start}',
+                f'Stop_Site_{stop}',
+                f'{phase}', )
+        else:
+            header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                self.level,
+                self.gene_symbol,
+                self.gid,
+                self.tid,
+                self.strand,
+                self.chromosome,
+                self.biotype,
+                self.tsl,
+                self.counts,
+                f'Len={length}',
+                f'Start_Site_{start}',
+                f'Stop_Site_{stop}',
+                f'{phase}', )
 
-            lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+        rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+
+        lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+        scalene_profiler.stop()
+
+
+
+
+
+        # for i in self.converted.index:
+        # with open(self.CanDB) as f:
+        #     for record in SeqIO.parse(f, 'fasta'):
+        #         for i in self.converted.index:
+        #             self.id = '-'
+        #             phase = self.converted.loc[i]['phase']
+        #             length = self.converted.loc[i]['len']
+        #             start = self.converted.loc[i]['start']
+        #             stop = self.converted.loc[i]['stop']
+        #             pep = i
+        #             self.old = self.level
+        #             if record.seq == pep:
+        #                 # print(record.seq,'-------',pep)
+        #                 # print(record.id)
+        #                 self.level = 'Canonical'
+        #                 self.id = record.id
+        #             if self.id != '-':
+        #                 header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+        #                     self.level,
+        #                     self.gene_symbol,
+        #                     self.gid,
+        #                     self.tid,
+        #                     self.strand,
+        #                     self.chromosome,
+        #                     self.biotype,
+        #                     self.tsl,
+        #                     self.counts,
+        #                     f'Len={length}',
+        #                     f'Start_Site_{start}',
+        #                     f'Stop_Site_{stop}',
+        #                     f'{phase}', )
+        #             else:
+        #                 header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+        #                     self.level,
+        #                     self.gene_symbol,
+        #                     self.gid,
+        #                     self.tid,
+        #                     self.strand,
+        #                     self.chromosome,
+        #                     self.biotype,
+        #                     self.tsl,
+        #                     self.counts,
+        #                     f'Len={length}',
+        #                     f'Start_Site_{start}',
+        #                     f'Stop_Site_{stop}',
+        #                     f'{phase}', )
+        #
+        #             rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+        #
+        #             lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+        #
+        #
+        # with open(self.IsoDB) as f:
+        #     for record in SeqIO.parse(f, 'fasta'):
+        #         for i in self.converted.index:
+        #             self.id = '-'
+        #             phase = self.converted.loc[i]['phase']
+        #             length = self.converted.loc[i]['len']
+        #             start = self.converted.loc[i]['start']
+        #             stop = self.converted.loc[i]['stop']
+        #             pep = i
+        #             self.old = self.level
+        #             if record.seq == pep:
+        #                 # print(record.seq,'-------',pep)
+        #                 # print(record.id)
+        #                 self.level = 'Canonical'
+        #                 self.id = record.id
+        #             if self.id != '-':
+        #                 header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+        #                     self.level,
+        #                     self.gene_symbol,
+        #                     self.gid,
+        #                     self.tid,
+        #                     self.strand,
+        #                     self.chromosome,
+        #                     self.biotype,
+        #                     self.tsl,
+        #                     self.counts,
+        #                     f'Len={length}',
+        #                     f'Start_Site_{start}',
+        #                     f'Stop_Site_{stop}',
+        #                     f'{phase}', )
+        #             else:
+        #                 header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+        #                     self.level,
+        #                     self.gene_symbol,
+        #                     self.gid,
+        #                     self.tid,
+        #                     self.strand,
+        #                     self.chromosome,
+        #                     self.biotype,
+        #                     self.tsl,
+        #                     self.counts,
+        #                     f'Len={length}',
+        #                     f'Start_Site_{start}',
+        #                     f'Stop_Site_{stop}',
+        #                     f'{phase}', )
+        #
+        #             rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
+        #
+        #             lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+        #
+
+
+
 
 
 class Post_hoc_reassignment():
@@ -696,22 +816,39 @@ class Post_hoc_reassignment():
                                        ) -> SeqRecord:
         self.canonical_aa = ''
         self.old = self.level
-        with open(DB) as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                if record.seq == self.p.prot:
-                    self.level = 'Canonical'
-                    self.id = record.id
+        if self.p.prot == DB.keys():
+            self.level = 'Canonical'
+            self.id = DB[self.p.prot]
+            print(self.id)
+
+
+
+
+        # with open(DB) as f:
+        #     for record in SeqIO.parse(f, 'fasta'):
+        #         if record.seq == self.p.prot:
+        #             self.level = 'Canonical'
+        #             self.id = record.id
         # print(self.old, ' ', self.level)
 
     def get_aa_uniprot_local(self,
                              DB,
                              ) -> SeqRecord:
+
         self.canonical_aa = ''
         self.old = self.level
-        with open(DB) as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                if record.seq == self.p.prot:
-                    self.id = record.id
+        if self.p.prot in DB.keys():
+            self.id = DB[self.p.prot]
+            print(self.id)
+
+
+
+        # self.canonical_aa = ''
+        # self.old = self.level
+        # with open(DB) as f:
+        #     for record in SeqIO.parse(f, 'fasta'):
+        #         if record.seq == self.p.prot:
+        #             self.id = record.id
         # print(self.old, ' ', self.level)
         # print(self.canonical_aa)
 

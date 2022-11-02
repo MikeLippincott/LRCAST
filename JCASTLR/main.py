@@ -26,7 +26,7 @@ from scalene import scalene_profiler
 # Main function
 def main():
     start = time.perf_counter()
-    scalene_profiler.start()
+
     # Parse Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", '--model', action='store_true')
@@ -42,7 +42,6 @@ def main():
     gtf = args.gtf
     global altORFs
     altORFs = args.altORFs
-    # global it
     # it = 0
     fasta = args.fasta
     prefix = args.file_prefix
@@ -87,10 +86,11 @@ def main():
     print('Starting Post Run Analysis')
     prs.post_run_counts(out_location,prefix,altORFs)
     print(f'{time.perf_counter() - start} seconds')
-    scalene_profiler.stop()
+
 
 
 def paralell_me(record,g,out_location, prefix):
+    # scalene_profiler.start()
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
     r = record
@@ -121,7 +121,7 @@ def paralell_me(record,g,out_location, prefix):
         else:
             p.prot = p1
         if altORFs:
-            orfs = ist.ORFs(s,p,'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s,p, g,'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -144,7 +144,7 @@ def paralell_me(record,g,out_location, prefix):
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         if altORFs:
-            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -168,7 +168,7 @@ def paralell_me(record,g,out_location, prefix):
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         if altORFs:
-            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -183,7 +183,7 @@ def paralell_me(record,g,out_location, prefix):
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         if altORFs:
-            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -199,7 +199,7 @@ def paralell_me(record,g,out_location, prefix):
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         if altORFs:
-            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -213,7 +213,7 @@ def paralell_me(record,g,out_location, prefix):
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
         if altORFs:
-            orfs = ist.ORFs(s, p, 'resources/DB/reviewed_canonical.fasta',
+            orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
@@ -223,7 +223,8 @@ def paralell_me(record,g,out_location, prefix):
         print("Orphan Read")
 
     ph = ist.Post_hoc_reassignment(s, p)
-    ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    # ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
+    ph.get_canonical_aa_uniprot_local(g.can)
     ph.make_header()
 
     # post hoc change of level
@@ -232,7 +233,8 @@ def paralell_me(record,g,out_location, prefix):
         lrf.prot_to_fasta(seq, out_location, prefix, "_Canonical")
 
     elif ph.level != 'Canonical':
-        ph.get_aa_uniprot_local('resources/DB/reviewed_alternative_isoforms.fasta')
+        # ph.get_aa_uniprot_local('resources/DB/reviewed_alternative_isoforms.fasta')
+        ph.get_aa_uniprot_local(g.iso)
         ph.make_header()
         ph.level_changer()
         # if ph.old != ph.level:
@@ -268,6 +270,7 @@ def paralell_me(record,g,out_location, prefix):
     # print(it)
     # print("completed")
     # pbar.update(1)
+    # scalene_profiler.stop()
 
 
 if __name__ == "__main__":
