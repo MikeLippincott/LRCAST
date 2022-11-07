@@ -1,8 +1,7 @@
 
 # Run mode dictates whether short reads are included in analysis or not.
 # short reads will be used to correct the long reads and identify Junctions
-runmode:
-  "Long"
+runmode: "Long"
 
 # Note that samples need to paired positionally to be analyzed correctly
 # ex. test1_long and test1_short belong to the same sample type
@@ -17,7 +16,7 @@ samples:
     - 'test0_long'
 
   short:
-    - 'test0_short'
+#    - 'test0_short'
 
   exp:
     'experiment_info(1)'

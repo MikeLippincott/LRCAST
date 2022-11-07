@@ -272,6 +272,12 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
             print("error post hoc")
     else:
         print("Error")
+
+    del s
+    del p
+    del orfs
+    del ph
+    del r
     # it += 1
     # print(it)
     # print("completed")

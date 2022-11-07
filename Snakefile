@@ -15,8 +15,8 @@ if test == "Long":
     include: "workflow/rules/correct_with_gtf.smk"
     rule all:
         input:
-            expand("results/qc/{qc_sample}.html",qc_sample=config['qc_list']),
-            expand("results/qc/{qc_sample}_fastqc.zip",qc_sample=config['qc_list']),\
+            # expand("results/qc/{qc_sample}.html",qc_sample=config['qc_list']),
+            # expand("results/qc/{qc_sample}_fastqc.zip",qc_sample=config['qc_list']),\
             "results/qc/multiqc_report.html",
             expand("results/aligned/long/aligned.{ext}",sample=config["samples"]["long"],ext=["bam", "bed"]),
             "results/corrected/_all_corrected.bed",
@@ -29,7 +29,7 @@ if test == "Long":
             # 'results/DGE/normalized_counts.txt',
             # "results/qc/qualimap/qualimapReport.html",
             # "results/qc/qualimap/rnaseq_qc_results.txt"
-            'results/DGE/counts_matrix.tsv',
+            'results/DGE/counts_matrix.counts.tsv',
             'results/DGE/diffsplice.alt3.events.quant.tsv',
             'results/DGE/diffsplice.alt5.events.quant.tsv',
             'results/DGE/diffsplice.es.events.quant.tsv',
