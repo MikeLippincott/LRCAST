@@ -35,8 +35,7 @@ class Gtf:
         print("LOADING GTF FILES INTO PANDAS DATAFRAMES.")
         # FLAIR output gtf
         self.gtf = read_gtf(gtf_loc)
-        # Ensembl gtf
-        self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
+
         self.counts = pd.read_table(counts_matrix)
         print("LOADING sp DATABASES")
         canDB = 'resources/DB/reviewed_canonical.fasta'
@@ -49,6 +48,9 @@ class Gtf:
         with open(IsoDB) as f:
             for record in SeqIO.parse(f, 'fasta'):
                 self.iso[record.seq] = record.id
+    def load_gtf(self):
+        # Ensembl gtf
+        self.gtf_file = read_gtf("resources/genome/Homo_sapiens.GRCh38.107.gtf")
 
     # def read_cutoff(self, write_dir):
     #     exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
@@ -177,7 +179,7 @@ class Sequences(object):
 
             else:
                 print("Check Meta Data method in Sequences Class")
-            print(self.biotype)
+            # print(self.biotype)
             sleep(0.1)
             if pd.isnull(enst['gene_name'].to_list()):
                 self.gene_symbol = '-'

@@ -56,7 +56,10 @@ def main():
         for record in SeqIO.parse(f, 'fasta'):
             n += 1
         print(f'{n} transcripts to process.')
+
     g = ist.Gtf(gtf,'results/DGE/counts_matrix.counts.tsv')
+    g.load_gtf()
+    ggtf = g.gtf_file
     g.min_count = int(args.read_cutoff)
     print(g.min_count)
 
@@ -68,13 +71,12 @@ def main():
 
         result = pool.starmap_async(paralell_me,
                                      tqdm([(record,
-                                            g,
+                                            ggtf,
                                             out_location,
-                                            prefix, altORFs,filtering) for record in SeqIO.parse(f, 'fasta')]))
+                                            prefix, altORFs,filtering) for record in SeqIO.parse(f, 'fasta')])).get()
 
-
-    pool.close()
-    pool.join()
+        pool.close()
+        pool.join()
 
 
 
@@ -90,6 +92,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
     # scalene_profiler.start()
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
+    # print(g)
     r = record
     s = ist.Sequences(g, r)
     if filtering:
