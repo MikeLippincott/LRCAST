@@ -278,6 +278,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
     del orfs
     del ph
     del r
+    del g
     # it += 1
     # print(it)
     # print("completed")
