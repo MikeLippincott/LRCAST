@@ -105,6 +105,7 @@ class Sequences(object):
         self.strand = self.gtf0['strand'].unique()
         if len(self.strand) == 1:
             self.strand = self.strand[0]
+            print(self.strand)
         else:
             self.strand = 0
         self.frame = self.gtf0['frame'].unique()
@@ -173,9 +174,10 @@ class Sequences(object):
                 else:
                     biotype = '-'
                 self.biotype = biotype
+
             else:
                 print("Check Meta Data method in Sequences Class")
-
+            print(self.biotype)
             sleep(0.1)
             if pd.isnull(enst['gene_name'].to_list()):
                 self.gene_symbol = '-'
@@ -245,7 +247,7 @@ class Sequences(object):
             self.biotype = "L5"
             # self.gene_name = "L5"
             self.gene_symbol = "L5"
-            self.chromosome = self.gtf0['seqname'].to_list()[0]
+            self.chromosome = self.gtf0['seqname'].to_list()
             # self.uniprot = "L5"
             self.tsl = "L5"
 
@@ -694,10 +696,6 @@ class ORFs:
 
         lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
         # scalene_profiler.stop()
-
-        def __del__(self):
-            print('Inside the destructor')
-            print('Object gets destroyed')
 
 
 

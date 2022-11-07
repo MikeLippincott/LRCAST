@@ -27,7 +27,7 @@ global altORFs
 
 # Main function
 def main():
-    scalene_profiler.start()
+    # scalene_profiler.start()
     start = time.perf_counter()
 
     # Parse Arguments
@@ -70,7 +70,7 @@ def main():
                                      tqdm([(record,
                                             g,
                                             out_location,
-                                            prefix, altORFs,filtering) for record in SeqIO.parse(f, 'fasta')])).get()
+                                            prefix, altORFs,filtering) for record in SeqIO.parse(f, 'fasta')]))
 
 
     pool.close()
@@ -83,7 +83,7 @@ def main():
     print('Starting Post Run Analysis')
     prs.post_run_counts(out_location,prefix,altORFs)
     print(f'{time.perf_counter() - start} seconds')
-    scalene_profiler.stop()
+    # scalene_profiler.stop()
 
 
 def paralell_me(record,g,out_location, prefix, altORFs,filtering):
@@ -125,7 +125,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
+
         # seq = p.str_to_seqrec(prot_seq)
         # Canonical.append(seq)
     elif s.level == "L1":
@@ -149,7 +149,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
+
         # print(prot_seq)
         # seq = p.str_to_seqrec(prot_seq)
         # L1.append(seq)
@@ -174,7 +174,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
+
         # seq = p.str_to_seqrec(prot_seq)
         # L2.append(seq)
     elif s.level == "L3":
@@ -190,7 +190,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
+
         p.make_header()
         # seq = p.str_to_seqrec(prot_seq)
         # L3.append(seq)
@@ -207,7 +207,7 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
+
         # seq = p.str_to_seqrec(prot_seq)
         # L4.append(seq)
     elif s.level == "L5":
@@ -222,7 +222,6 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
             orfs.dict_parse()
             orfs.write_header_loop(out_location, prefix)
-            del orfs
         # seq = p.str_to_seqrec(prot_seq)
         # L5.append(seq)
     else:
@@ -275,10 +274,11 @@ def paralell_me(record,g,out_location, prefix, altORFs,filtering):
 
     del s
     del p
-    del orfs
     del ph
     del r
     del g
+    if altORFs:
+        del orfs
     # it += 1
     # print(it)
     # print("completed")
