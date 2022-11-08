@@ -102,7 +102,8 @@ class Sequences(object):
         queries the ensembl gtf for all rows belonging to gene and retrieves strand/frame (phase) information
         :return: no return
         """
-        self.gtf0 = self.gtf.query(f'gene_id == "{self.gid}"').query('feature == "transcript"')
+        # self.gtf0 = self.gtf.query(f'gene_id == "{self.gid}"').query('feature == "transcript"')
+        self.gtf0 = self.gtf.loc[(self.gtf['gene_id'] == self.gid) & (self.gtf['feature'] == "transcript")]
         self.strand = self.gtf0['strand'].unique()
         if len(self.strand) == 1:
             self.strand = self.strand[0]
@@ -151,15 +152,17 @@ class Sequences(object):
         """
         # print(self.rid)
         if 'ENST' in self.rid:
-            enst = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('feature == "transcript"')
-            gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
+            # enst = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('feature == "transcript"')
+            # gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
+            enst = self.gtf_file.loc[(self.gtf_file['transcript_id'] == self.tid) & (self.gtf_file['feature'] == "transcript")]
+            gtf0 = self.gtf_file.loc[(self.gtf_file['transcript_id'] == self.tid) & (self.gtf_file['transcript_biotype'] == "protein_coding")]
             if len(gtf0) > 0:
                 self.level = "L1"
                 self.biotype = "protein_coding"
             elif len(gtf0) == 0:
                 self.level = "L3"
                 biotype = ''
-                tmp = np.unique(self.gtf_file.query(f'transcript_id == "{self.tid}"')['transcript_biotype'])
+                tmp = np.unique(self.gtf_file.loc[(self.gtf_file['transcript_id'] == self.tid)]['transcript_biotype'])
                 if len(tmp) > 0:
                     if len(biotype) > 0:
                         biotype += '__'
@@ -192,13 +195,17 @@ class Sequences(object):
             # return self.level, self.gene_name, self.gene_symbol, self.uniprot, self.chromosome
 
         elif 'ENSG' in self.rid:
-            gtf0 = self.gtf_file.query(f'gene_id == "{self.gid}"').query('transcript_biotype == "protein_coding" ')
+            # gtf0 = self.gtf_file.query(f'gene_id == "{self.gid}"').query('transcript_biotype == "protein_coding" ')
+            gtf0 = self.gtf_file.loc[(self.gtf_file['gene_id'] == self.gid) & (self.gtf_file['transcript_biotype'] == "protein_coding")]
+
             if len(gtf0) > 0:
                 self.level = "L2"
                 self.biotype = "protein_coding"
             elif len(gtf0) == 0:
                 biotype = ''
-                tmp = np.unique(self.gtf_file.query(f'gene_id == "{self.gid}"')['transcript_biotype'])
+                # tmp = np.unique(self.gtf_file.query(f'gene_id == "{self.gid}"')['transcript_biotype'])
+                tmp = np.unique(self.gtf_file.loc[(self.gtf_file['gene_id'] == self.gid)]['transcript_biotype'])
+
                 if len(tmp) > 0:
                     if len(biotype) > 0:
                         biotype += '__'
@@ -218,7 +225,9 @@ class Sequences(object):
                 print("Check Meta Data method in Sequences Class")
 
             # print(self.gid)
-            ensg = self.gtf_file.query(f'gene_id == "{self.gid}"').query('feature == "gene"')
+            # ensg = self.gtf_file.query(f'gene_id == "{self.gid}"').query('feature == "gene"')
+            ensg = self.gtf_file.loc[(self.gtf_file['gene_id'] == self.gid) & (self.gtf_file['feature'] == "gene")]
+
             sleep(0.1)
 
             # print(self.gene_name)
@@ -255,15 +264,26 @@ class Sequences(object):
         """
         :return: trimmed sequence for insilico translation
         """
-        gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
-        TSS = gtf0.query('feature == "start_codon" ')
+        # gtf0 = self.gtf_file.query(f'transcript_id == "{self.tid}"').query('transcript_biotype == "protein_coding" ')
+        gtf0 = self.gtf_file.loc[(self.gtf_file['transcript_id'] == self.tid) & (self.gtf_file['transcript_biotype'] == "protein_coding")]
+
+        # TSS = gtf0.query('feature == "start_codon" ')
+        TSS = gtf0.loc[(gtf0['feature'] == "start_codon")]
+
         if TSS['start'].to_list() == []:
-            gtf0 = self.gtf_file.query(f'gene_id == "{self.gid}"').query('transcript_biotype == "protein_coding" ')
-            TSS = gtf0.query('feature == "start_codon" ')
-        transcript_df = gtf0.query('feature == "transcript" ')
-        exons = gtf0.query('feature == "exon" ')
+            # gtf0 = self.gtf_file.query(f'gene_id == "{self.gid}"').query('transcript_biotype == "protein_coding" ')
+            gtf0 = self.gtf_file.loc[(self.gtf_file['gene_id'] == self.gid) & (self.gtf_file['transcript_biotype'] == "protein_coding")]
+
+            # TSS = gtf0.query('feature == "start_codon" ')
+            TSS = gtf0.loc[(gtf0['feature'] == "start_codon")]
+
+        transcript_df = gtf0.loc[(gtf0['feature'] == "transcript")]
+        # exons = gtf0.query('feature == "exon" ')
+        exons = gtf0.loc[(gtf0['feature'] == "exon")]
         # exons = exons.sort_values(by="exon_number")
-        jcast = self.gtf.query(f'transcript_id == "{self.tid}"').query('feature == "transcript" ')
+        # jcast = self.gtf.query(f'transcript_id == "{self.tid}"').query('feature == "transcript" ')
+        jcast = self.gtf.loc[(self.gtf['transcript_id'] == self.tid) & (self.gtf['feature'] == "transcript")]
+
         x1 = jcast['start'].to_list()[0]
         x2 = jcast['end'].to_list()[0]
         # print(transcript_id)

@@ -88,6 +88,7 @@ def main():
 
 
 def paralell_me(record,g,out_location, prefix, altORFs):
+    print('starting')
     # scalene_profiler.start()
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
@@ -95,16 +96,18 @@ def paralell_me(record,g,out_location, prefix, altORFs):
     s = ist.Sequences(g, r)
     s.get_counts()
     # print(s.counts)
-    # if int(s.counts) <= int(g.min_count):
-    if s.counts <= g.min_count:
-        return 1
+    # # if int(s.counts) <= int(g.min_count):
+    # if s.counts <= g.min_count:
+    #     return 1
     s.subset_gtf()
     s.get_meta()
     # a = ist.Canonical_test(s)
     # a.get_canonical_aa()
     # a.make_header()
     # print(a.level, a.rid, a.biotype)
+    # print('level: ',s.level)
     if s.level == "Canonical":
+        # print('can')
         # a = ist.Canonical_test(s)
         # a.get_canonical_aa()
         # a.make_header()
@@ -126,6 +129,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # seq = p.str_to_seqrec(prot_seq)
         # Canonical.append(seq)
     elif s.level == "L1":
+        # print('level: ', s.level)
         # a = ist.Canonical_test(s)
         # a.get_canonical_aa()
         # a.make_header()
@@ -150,6 +154,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # seq = p.str_to_seqrec(prot_seq)
         # L1.append(seq)
     elif s.level == "L2":
+        # print('level: ', s.level)
         # a = ist.Canonical_test(s)
         # a.get_canonical_aa()
         # a.make_header()
@@ -173,6 +178,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # seq = p.str_to_seqrec(prot_seq)
         # L2.append(seq)
     elif s.level == "L3":
+        # print('level: ', s.level)
         # a = ist.Canonical_test(s)
         # a.get_canonical_aa()
         # a.make_header()
@@ -189,6 +195,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # seq = p.str_to_seqrec(prot_seq)
         # L3.append(seq)
     elif s.level == "L4":
+        # print('level: ', s.level)
         # a = ist.Canonical_test(s)
         # a.get_canonical_aa()
         # a.make_header()
@@ -204,6 +211,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # seq = p.str_to_seqrec(prot_seq)
         # L4.append(seq)
     elif s.level == "L5":
+        # print('level: ', s.level)
         # a = ist.Canonical_test(s)
         # a.make_header()
         p = ist.Peptide(s)
@@ -219,7 +227,7 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         # L5.append(seq)
     else:
         print("Orphan Read")
-
+    # print('level: ', s.level)
     ph = ist.Post_hoc_reassignment(s, p)
     # ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
     ph.get_canonical_aa_uniprot_local(g.can)
