@@ -53,7 +53,7 @@ def main():
         for record in SeqIO.parse(f, 'fasta'):
             n += 1
         print(f'{n} transcripts to process.')
-    g = ist.Gtf(gtf,'results/DGE/counts_matrix.tsv')
+    g = ist.Gtf(gtf,'results/DGE/counts_matrix.counts.tsv')
     if args.model:
         g.read_cutoff('results')
         print("model")
