@@ -30,8 +30,8 @@ def main():
 
     # Parse Arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", '--model', action='store_true')
-    parser.add_argument('-r', '--read_cutoff',help='read cutoff value', required=False)
+    # parser.add_argument("-m", '--model', action='store_true')
+    parser.add_argument('-r', '--read_cutoff',help='read cutoff value', required=True)
     parser.add_argument('-a', '--altORFs', action='store_true')
     parser.add_argument('-g', '--gtf', help='path to gtf file', required=True)
     parser.add_argument('-f', '--fasta', help='path to fasta file', required=True)
@@ -47,6 +47,7 @@ def main():
     fasta = args.fasta
     prefix = args.file_prefix
     out_location = args.outpath
+    read_cutoff_val = int(args.read_cutoff)
 
     with open(fasta) as f:
         n = 0
@@ -54,12 +55,11 @@ def main():
             n += 1
         print(f'{n} transcripts to process.')
     g = ist.Gtf(gtf,'results/DGE/counts_matrix.counts.tsv')
-    if args.model:
-        g.read_cutoff('results')
-        print("model")
-    else:
-        g.min_count = int(args.read_cutoff)
-    print(g.min_count)
+    print(f'{len(g.gtf_file)} records in genomic gtf')
+    g.read_cutoff(read_cutoff_val)
+    print(f'{len(g.gtf_file)} records after filtering')
+
+    # print(g.min_count)
 
     duplicate_count = 0
     print(mp.cpu_count())
@@ -277,6 +277,13 @@ def paralell_me(record,g,out_location, prefix, altORFs):
     # print("completed")
     # pbar.update(1)
     # scalene_profiler.stop()
+
+    del s
+    del p
+    del ph
+    del r
+    if altORFs:
+        del orfs
 
 if __name__ == "__main__":
     main()

@@ -51,7 +51,7 @@ class Gtf:
             for record in SeqIO.parse(f, 'fasta'):
                 self.iso[record.seq] = record.id
 
-    def read_cutoff(self, write_dir):
+    def read_cutoff(self, min_count):
         exp = pd.read_table('resources/experiment/experiment_info.tsv', header=None)
         lst = []
         for i, j, k in zip(exp[0], exp[1], exp[2]):
@@ -61,17 +61,17 @@ class Gtf:
         for i in lst:
             count += self.counts[f'{i}']
         self.counts['counts'] = count
-        df1 = self.counts[(self.counts.counts > 1)]
-        write_dir = os.getcwd()
-        ln_sjc, best_mix_model, self.min_count = model.general_mixture_model(sum_sjc_array=df1['counts'].astype(int))
-        model.plot_general_mixture_model(
-            ln_sjc,
-            best_mix_model,
-            self.min_count,
-            write_dir=write_dir,
-            filename='model',
-        )
-        df3 = self.counts[(self.counts.counts > self.min_count)]
+        # df1 = self.counts[(self.counts.counts > 1)]
+        # write_dir = os.getcwd()
+        # ln_sjc, best_mix_model, self.min_count = model.general_mixture_model(sum_sjc_array=df1['counts'].astype(int))
+        # model.plot_general_mixture_model(
+        #     ln_sjc,
+        #     best_mix_model,
+        #     self.min_count,
+        #     write_dir=write_dir,
+        #     filename='model',
+        # )
+        df3 = self.counts[(self.counts.counts > min_count)]
         self.gtf['ids'] = self.gtf["transcript_id"] + "_" + self.gtf["gene_id"]
         self.gtf = pd.merge(self.gtf, df3, on=['ids'], how='right')
         gene_ids = np.unique(self.gtf['gene_id'])
