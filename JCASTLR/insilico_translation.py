@@ -74,6 +74,8 @@ class Gtf:
         df3 = self.counts[(self.counts.counts > min_count)]
         self.gtf['ids'] = self.gtf["transcript_id"] + "_" + self.gtf["gene_id"]
         self.gtf = pd.merge(self.gtf, df3, on=['ids'], how='right')
+        # gene_ids = np.unique(self.gtf['transcript_id'])
+
         gene_ids = np.unique(self.gtf['gene_id'])
         print(f'{len(gene_ids)} Filtered transcripts to Process.')
         bools = self.gtf_file.gene_id.isin(gene_ids)
@@ -639,8 +641,6 @@ class ORFs:
         return lst[0]
 
     def dict_parse(self):
-
-
         converted = pd.DataFrame.from_dict(self.orfs, orient='index')
         converted['phase'] = converted['phase'].apply(ORFs.string_fix)
         converted['len'] = converted['len'].apply(ORFs.string_fix)
@@ -655,6 +655,7 @@ class ORFs:
 
     def write_header_loop(self, out_location, prefix):
         # scalene_profiler.start()
+        pep = 1
         for i in self.converted.index:
             self.id = '-'
             phase = self.converted.loc[i]['phase']

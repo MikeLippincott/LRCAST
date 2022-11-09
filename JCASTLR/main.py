@@ -53,16 +53,17 @@ def main():
         n = 0
         for record in SeqIO.parse(f, 'fasta'):
             n += 1
-        print(f'{n} transcripts to process.')
+        # print(f'{n} transcripts to process.')
     g = ist.Gtf(gtf,'results/DGE/counts_matrix.counts.tsv')
+    print(f'{n} transcripts to process.')
     print(f'{len(g.gtf_file)} records in genomic gtf')
     g.read_cutoff(read_cutoff_val)
-    print(f'{len(g.gtf_file)} records after filtering')
+    print(f'{len(g.gtf_file)} records in genomic gtf after filtering')
 
     # print(g.min_count)
 
     duplicate_count = 0
-    print(mp.cpu_count())
+    print(f'{mp.cpu_count()} distributed processes to be started')
     pool = mp.Pool(mp.cpu_count())
 
     with open(fasta) as f:
@@ -88,7 +89,7 @@ def main():
 
 
 def paralell_me(record,g,out_location, prefix, altORFs):
-    print('starting')
+    # print('starting')
     # scalene_profiler.start()
     # n1 += 1
     # lrf.progress_bar(n1, n, 50)
