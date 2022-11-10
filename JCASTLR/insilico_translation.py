@@ -655,7 +655,6 @@ class ORFs:
 
     def write_header_loop(self, out_location, prefix):
         # scalene_profiler.start()
-        pep = 1
         for i in self.converted.index:
             self.id = '-'
             phase = self.converted.loc[i]['phase']
@@ -664,50 +663,51 @@ class ORFs:
             stop = self.converted.loc[i]['stop']
             pep = i
             self.old = self.level
+            # print(self.can['MSDSYLPSYYSPSIGFSYSLGEAAWSTGGDTAMPYLTSYGQLSNGEPHFLPDAMFGQPGALGSTPFLGQHGFNFFPSGIDFSAWGNNSSQGQSTQSSGYSSNYAYAPSSLGGAMIDGQSAFANETLNKAPGMNTIDQGMAALKLGSTEVASNVPKVVGSAVGSGSITSNIVASNSLPPATIAPPKPASWADIASKPAKQQPKLKTKNGIAGSSLPPPPIKHNMDIGTWDNKGPVAKAPSQALVQNIGQPTQGSPQPVGQQANNSPPVAQASVGQQTQPLPPPPPQPAQLSVQQQAAQPTRWVAPRNRGSGFGHNGVDGNGVGQSQAGSGSTPSEPHPVLEKLRSINNYNPKDFDWNLKHGRVFIIKSYSEDDIHRSIKYNIWCSTEHGNKRLDAAYRSMNGKGPVYLLFSVNGSGHFCGVAEMKSAVDYNTCAGVWSQDKWKGRFDVRWIFVKDVPNSQLRHIRLENNENKPVTNSRDTQEVPLEKAKQVLKIIASYKHTTSIFDDFSHYEKRQEEEESVKKERQGRGK'])
+            if pep in self.can.keys():
+                print(pep,"_____",self.can[pep])
+                self.level = 'Canonical'
+                self.id = self.can[pep]
+                # print(self.id)
 
-        if pep in self.can.keys():
-            self.level = 'Canonical'
-            self.id = self.can[pep]
-            # print(self.id)
+            if pep in self.iso.keys():
+                self.id = self.iso[pep]
+                # print(self.id)
 
-        if pep in self.iso.keys():
-            self.id = self.can[pep]
-            # print(self.id)
+            if self.id != '-':
+                header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                    self.level,
+                    self.gene_symbol,
+                    self.gid,
+                    self.tid,
+                    self.strand,
+                    self.chromosome,
+                    self.biotype,
+                    self.tsl,
+                    self.counts,
+                    f'Len={length}',
+                    f'Start_Site_{start}',
+                    f'Stop_Site_{stop}',
+                    f'{phase}', )
+            else:
+                header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
+                    self.level,
+                    self.gene_symbol,
+                    self.gid,
+                    self.tid,
+                    self.strand,
+                    self.chromosome,
+                    self.biotype,
+                    self.tsl,
+                    self.counts,
+                    f'Len={length}',
+                    f'Start_Site_{start}',
+                    f'Stop_Site_{stop}',
+                    f'{phase}', )
 
-        if self.id != '-':
-            header = self.id + "|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                self.level,
-                self.gene_symbol,
-                self.gid,
-                self.tid,
-                self.strand,
-                self.chromosome,
-                self.biotype,
-                self.tsl,
-                self.counts,
-                f'Len={length}',
-                f'Start_Site_{start}',
-                f'Stop_Site_{stop}',
-                f'{phase}', )
-        else:
-            header = "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}".format(
-                self.level,
-                self.gene_symbol,
-                self.gid,
-                self.tid,
-                self.strand,
-                self.chromosome,
-                self.biotype,
-                self.tsl,
-                self.counts,
-                f'Len={length}',
-                f'Start_Site_{start}',
-                f'Stop_Site_{stop}',
-                f'{phase}', )
+            rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
 
-        rec = SeqRecord(Seq(pep), f'{header}', description=self.gene_symbol)
-
-        lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
+            lrf.prot_to_fasta_ORF(rec, out_location, prefix, "_altORFs")
         # scalene_profiler.stop()
 
 

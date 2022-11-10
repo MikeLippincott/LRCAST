@@ -219,15 +219,20 @@ def paralell_me(record,g,out_location, prefix, altORFs):
         prot_seq = p.multi_phase_translate()
         # p.get_canonical_aa_uniprot_local()
         p.make_header()
+        # print(p.dict2)
         if altORFs:
             orfs = ist.ORFs(s, p, g, 'resources/DB/reviewed_canonical.fasta',
                                    'resources/DB/reviewed_alternative_isoforms.fasta')
+            # print(orfs.orfs)
+
             orfs.dict_parse()
+            # print(orfs.converted)
             orfs.write_header_loop(out_location, prefix)
         # seq = p.str_to_seqrec(prot_seq)
         # L5.append(seq)
     else:
         print("Orphan Read")
+
     # print('level: ', s.level)
     ph = ist.Post_hoc_reassignment(s, p)
     # ph.get_canonical_aa_uniprot_local('resources/DB/reviewed_canonical.fasta')
