@@ -4,14 +4,22 @@
 ## McNJASTI
 
 
-## Long
+#### LRCAST uses output files from the flair pipeline (Brooks Lab) to generate a protein Database
+
+### Run snakemake for flair pipeline processing 
 ```
-snakemake -j4 --ri --latency-wait 15
+snakemake --cores all --ri --latency-wait 15
 ```
 
+### Run LRCAST
 ```
 cd LRCAST
-python JCAST -g /path/to/flair/gtf -f /path/to/flair/fa -p prefix/name -r cutoff_value -a altORF_Mode -o output/path
+python JCAST -g /path/to/flair/gtf -f /path/to/flair/fa -p prefix/name -r cutoff_value<integer> -o output/path
+```
+
+##### Additional Args: 
+```
+-a #altORF generation mode 
 ```
 
 This workflow utilizes FLAIR and pieces from JCAST, and RIANA
